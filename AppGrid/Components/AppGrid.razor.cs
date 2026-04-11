@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Components;
 
-namespace FluentTable.Components.Shared;
+namespace AppGrid.Components;
 
 public partial class AppGrid<TItem> : ComponentBase
 {

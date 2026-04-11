@@ -11,4 +11,15 @@
     <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components" Version="4.14.0" />
     <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Icons" Version="4.14.0" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="AppGrid\AppGrid.csproj" />
+  </ItemGroup>
+
+  <!-- Exclude AppGrid sub-project sources from this project's compilation globs -->
+  <ItemGroup>
+    <Compile Remove="AppGrid\**" />
+    <Content Remove="AppGrid\**" />
+    <None Remove="AppGrid\**" />
+  </ItemGroup>
 </Project>
