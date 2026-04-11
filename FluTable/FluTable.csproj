@@ -6,8 +6,33 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <!-- NuGet package metadata -->
+    <PackageId>FluTable</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>Erkan Taylan</Authors>
+    <Company>Erkan Taylan</Company>
+    <Copyright>Copyright © Erkan Taylan 2026</Copyright>
+    <Description>Zero-dependency generic Blazor data grid component. Percentage-based column resize that maintains 100% table width, double-click auto-fit to content, multi-line cells, built-in row actions, and fully customizable cell and header templates via RenderFragment.</Description>
+    <PackageTags>blazor;datagrid;table;grid;component;razor-class-library;net10;resizable;auto-fit</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageProjectUrl>https://github.com/erkantaylan/FluTable</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/erkantaylan/FluTable.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
 </Project>
