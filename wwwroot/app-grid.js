@@ -10,32 +10,33 @@ export function init(tableId) {
     const cols = [...table.querySelectorAll('col')];
     const ths  = [...table.querySelectorAll('thead th')];
 
-    // Clear any previously JS-set widths on flex columns, then switch to
-    // auto layout so the browser computes natural content-based widths.
-    // This fixes two things:
-    //   1. Checkbox column no longer bloats when the actions column is toggled
-    //      (old % widths no longer summing to 100% caused fixed layout to
-    //       proportionally scale ALL columns, including fixed-pixel ones).
-    //   2. Title and Date columns start at their natural content width instead
-    //      of an arbitrary equal share.
-    cols.forEach(c => {
-        if (c.classList.contains('ag-col-flex')) c.style.width = '';
-    });
-    table.style.tableLayout = 'auto';
+    // First init vs reinit:
+    //   First init  — no JS-set widths yet; temporarily switch to auto layout
+    //                 so the browser computes content-based natural widths
+    //                 (Title → widest title text, Date → date text width).
+    //   Reinit      — flex cols already have JS-set % widths (e.g. after the
+    //                 Edit-rows toggle adds/removes the actions column).
+    //                 Mathematically redistribute those widths to fill the new
+    //                 available space — no layout switch, no flicker.
+    const isReinit = cols.some(c =>
+        c.classList.contains('ag-col-flex') && c.style.width !== ''
+    );
 
-    // Reading offsetWidth forces a synchronous reflow, giving us the
-    // auto-computed column widths before we lock everything down.
-    const tableWidth = table.offsetWidth;
-
-    ths.forEach((th, i) => {
-        if (i < cols.length && cols[i].classList.contains('ag-col-flex')) {
-            cols[i].style.width = pct(th.offsetWidth, tableWidth);
-        }
-    });
-
-    // Lock into fixed layout so all subsequent resize math stays in %
-    // and the total always equals 100% of the container.
-    table.style.tableLayout = 'fixed';
+    if (isReinit) {
+        redistributeFlex(table, cols, ths);
+    } else {
+        cols.forEach(c => {
+            if (c.classList.contains('ag-col-flex')) c.style.width = '';
+        });
+        table.style.tableLayout = 'auto';
+        const tableWidth = table.offsetWidth;   // forces reflow
+        ths.forEach((th, i) => {
+            if (i < cols.length && cols[i].classList.contains('ag-col-flex')) {
+                cols[i].style.width = pct(th.offsetWidth, tableWidth);
+            }
+        });
+        table.style.tableLayout = 'fixed';
+    }
 
     const ac = new AbortController();
     grids.set(tableId, ac);
@@ -48,7 +49,6 @@ export function init(tableId) {
         handle.addEventListener('mousedown', (e) => {
             if (e.button !== 0) return;
 
-            // Find the next flex column to the right that will absorb the delta
             const nextIdx = findNextFlex(cols, colIdx + 1);
             if (nextIdx === -1) return;
 
@@ -85,6 +85,39 @@ export function init(tableId) {
             document.addEventListener('mouseup',   onUp);
             e.preventDefault();
         }, { signal: ac.signal });
+    });
+}
+
+// Redistribute flex-col widths proportionally to fill the space left after
+// fixed columns, without touching table-layout (no visual flicker).
+// Uses specified pixel values from inline styles for fixed cols (more reliable
+// than offsetWidth, which can be skewed by overflow-scaling in fixed layout).
+function redistributeFlex(table, cols, ths) {
+    const tableWidth = table.offsetWidth;
+
+    let fixedTotal = 0;
+    cols.forEach((col, i) => {
+        if (col.classList.contains('ag-col-fixed') && i < ths.length) {
+            const w = col.style.width;
+            fixedTotal += (w && w.endsWith('px')) ? parseFloat(w) : ths[i].offsetWidth;
+        }
+    });
+
+    const available  = tableWidth - fixedTotal;
+    const flexItems  = [];
+    let   flexTotal  = 0;
+
+    ths.forEach((th, i) => {
+        if (i < cols.length && cols[i].classList.contains('ag-col-flex')) {
+            flexItems.push({ col: cols[i], w: th.offsetWidth });
+            flexTotal += th.offsetWidth;
+        }
+    });
+
+    if (flexTotal === 0) return;
+
+    flexItems.forEach(({ col, w }) => {
+        col.style.width = pct(w / flexTotal * available, tableWidth);
     });
 }
 
