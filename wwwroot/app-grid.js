@@ -1,23 +1,36 @@
-// Per-table state keyed by tableId
+// ── Per-table state ────────────────────────────────────────────────────────
+// tableId → { ac: AbortController | null, colgroupObs: MutationObserver | null }
 const grids = new Map();
 
-export function init(tableId) {
-    cleanup(tableId);
+// ── Table initialization ───────────────────────────────────────────────────
 
-    const table = document.getElementById(tableId);
-    if (!table) return;
+function initTable(table) {
+    const id = table.id;
+    if (!id) return;
 
-    const cols = [...table.querySelectorAll('col')];
-    const ths  = [...table.querySelectorAll('thead th')];
+    cleanup(id);
 
-    // First init vs reinit:
-    //   First init  — no JS-set widths yet; temporarily switch to auto layout
-    //                 so the browser computes content-based natural widths
-    //                 (Title → widest title text, Date → date text width).
-    //   Reinit      — flex cols already have JS-set % widths (e.g. after the
-    //                 Edit-rows toggle adds/removes the actions column).
-    //                 Mathematically redistribute those widths to fill the new
-    //                 available space — no layout switch, no flicker.
+    const cols    = [...table.querySelectorAll(':scope > colgroup > col')];
+    const ths     = [...table.querySelectorAll(':scope > thead > tr > th')];
+    const colgroup = table.querySelector(':scope > colgroup');
+
+    // Always watch the colgroup so future column additions/removals trigger reinit.
+    // This fires in a microtask — before the browser paints — so no flicker.
+    let colgroupObs = null;
+    if (colgroup) {
+        colgroupObs = new MutationObserver(() => initTable(table));
+        colgroupObs.observe(colgroup, { childList: true });
+    }
+
+    if (cols.length === 0) {
+        // No columns yet (first render before column registration completes).
+        // Colgroup observer will reinit once cols arrive.
+        grids.set(id, { ac: null, colgroupObs });
+        return;
+    }
+
+    // ── Width initialisation ─────────────────────────────────────────────
+
     const isReinit = cols.some(c =>
         c.classList.contains('ag-col-flex') && c.style.width !== ''
     );
@@ -25,33 +38,43 @@ export function init(tableId) {
     if (isReinit) {
         redistributeFlex(table, cols, ths);
     } else {
+        // First init: temporarily switch to auto layout so the browser
+        // computes natural content widths, then lock them in as percentages.
+
+        // Clear any previous flex widths and let auto layout breathe.
         cols.forEach(c => {
             if (c.classList.contains('ag-col-flex')) c.style.width = '';
         });
         table.style.tableLayout = 'auto';
-        const tableWidth = table.offsetWidth;   // forces reflow
-        ths.forEach((th, i) => {
+
+        // ── Batch reads (single reflow) ──────────────────────────────────
+        const tableWidth = table.offsetWidth;
+        const thWidths   = ths.map(th => th.offsetWidth);
+
+        // ── Batch writes (no reflows) ────────────────────────────────────
+        ths.forEach((_, i) => {
             if (i < cols.length && cols[i].classList.contains('ag-col-flex')) {
-                cols[i].style.width = pct(th.offsetWidth, tableWidth);
+                cols[i].style.width = pct(thWidths[i], tableWidth);
             }
         });
         table.style.tableLayout = 'fixed';
     }
 
-    const ac = new AbortController();
-    grids.set(tableId, ac);
+    // ── Resize handles ───────────────────────────────────────────────────
 
-    // Attach mousedown to every resize handle
+    const ac = new AbortController();
+
     ths.forEach((th, colIdx) => {
         const handle = th.querySelector('.ag-resize-handle');
         if (!handle) return;
 
-        handle.addEventListener('mousedown', (e) => {
+        handle.addEventListener('mousedown', e => {
             if (e.button !== 0) return;
 
             const nextIdx = findNextFlex(cols, colIdx + 1);
             if (nextIdx === -1) return;
 
+            // ── Batch read before drag starts ──────────────────────────
             const startX     = e.clientX;
             const startW     = th.offsetWidth;
             const startNextW = ths[nextIdx].offsetWidth;
@@ -61,15 +84,14 @@ export function init(tableId) {
             document.body.style.cursor     = 'col-resize';
             document.body.style.userSelect = 'none';
 
-            const onMove = (e) => {
-                const diff        = e.clientX - startX;
+            const onMove = ev => {
+                const diff        = ev.clientX - startX;
                 const maxDiff     = startNextW - minW;
                 const clampedDiff = Math.min(diff, maxDiff);
                 const clampedW    = Math.max(minW, startW + clampedDiff);
                 const newNextW    = startNextW - clampedDiff;
-
-                const tw = table.offsetWidth;
-                cols[colIdx].style.width  = pct(clampedW,  tw);
+                const tw          = table.offsetWidth;
+                cols[colIdx].style.width  = pct(clampedW, tw);
                 cols[nextIdx].style.width = pct(newNextW, tw);
             };
 
@@ -86,13 +108,16 @@ export function init(tableId) {
             e.preventDefault();
         }, { signal: ac.signal });
     });
+
+    grids.set(id, { ac, colgroupObs });
 }
 
-// Redistribute flex-col widths proportionally to fill the space left after
-// fixed columns, without touching table-layout (no visual flicker).
-// Uses specified pixel values from inline styles for fixed cols (more reliable
-// than offsetWidth, which can be skewed by overflow-scaling in fixed layout).
+// ── Redistribute flex-column widths proportionally ─────────────────────────
+// Called on reinit (e.g. actions column added/removed). No table-layout switch
+// needed — just redistribute the existing proportions into the new available space.
+
 function redistributeFlex(table, cols, ths) {
+    // ── Batch reads ──────────────────────────────────────────────────────
     const tableWidth = table.offsetWidth;
 
     let fixedTotal = 0;
@@ -103,9 +128,9 @@ function redistributeFlex(table, cols, ths) {
         }
     });
 
-    const available  = tableWidth - fixedTotal;
-    const flexItems  = [];
-    let   flexTotal  = 0;
+    const available = tableWidth - fixedTotal;
+    const flexItems = [];
+    let   flexTotal = 0;
 
     ths.forEach((th, i) => {
         if (i < cols.length && cols[i].classList.contains('ag-col-flex')) {
@@ -116,14 +141,20 @@ function redistributeFlex(table, cols, ths) {
 
     if (flexTotal === 0) return;
 
+    // ── Batch writes ─────────────────────────────────────────────────────
     flexItems.forEach(({ col, w }) => {
         col.style.width = pct(w / flexTotal * available, tableWidth);
     });
 }
 
-function cleanup(tableId) {
-    grids.get(tableId)?.abort();
-    grids.delete(tableId);
+// ── Helpers ────────────────────────────────────────────────────────────────
+
+function cleanup(id) {
+    const state = grids.get(id);
+    if (!state) return;
+    state.ac?.abort();
+    state.colgroupObs?.disconnect();
+    grids.delete(id);
 }
 
 function findNextFlex(cols, fromIdx) {
@@ -136,3 +167,29 @@ function findNextFlex(cols, fromIdx) {
 function pct(px, total) {
     return (px / total * 100).toFixed(3) + '%';
 }
+
+// ── Auto-discovery ─────────────────────────────────────────────────────────
+// Watch the document for [data-ag-table] elements being added or removed.
+// This handles:
+//   • SSR pages  — tables are present when the module runs
+//   • Interactive render — tables appear after Blazor hydrates
+//   • Enhanced navigation — tables appear/disappear as pages change
+
+new MutationObserver(mutations => {
+    for (const { addedNodes, removedNodes } of mutations) {
+        for (const node of addedNodes) {
+            if (node.nodeType !== 1) continue;
+            if (node.matches('[data-ag-table]'))                    initTable(node);
+            else node.querySelectorAll?.('[data-ag-table]').forEach(initTable);
+        }
+        for (const node of removedNodes) {
+            if (node.nodeType !== 1) continue;
+            if (node.matches('[data-ag-table]'))                          cleanup(node.id);
+            else node.querySelectorAll?.('[data-ag-table]').forEach(t => cleanup(t.id));
+        }
+    }
+}).observe(document.body, { childList: true, subtree: true });
+
+// Init any tables that are already in the DOM when this module loads
+// (covers SSR-rendered pages where the table exists before JS runs).
+document.querySelectorAll('[data-ag-table]').forEach(initTable);

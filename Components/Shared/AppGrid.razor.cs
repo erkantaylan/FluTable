@@ -1,12 +1,9 @@
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 
 namespace FluentTable.Components.Shared;
 
-public partial class AppGrid<TItem> : ComponentBase, IAsyncDisposable
+public partial class AppGrid<TItem> : ComponentBase
 {
-    [Inject] private IJSRuntime JS { get; set; } = default!;
-
     // Data
     [Parameter] public List<TItem>             Items      { get; set; } = [];
     [Parameter] public RenderFragment?         ChildContent { get; set; }
@@ -25,14 +22,12 @@ public partial class AppGrid<TItem> : ComponentBase, IAsyncDisposable
 
     private readonly List<AppGridColumn<TItem>> _columns  = [];
     private readonly string                     _tableId  = "ag-" + Guid.NewGuid().ToString("N")[..8];
-    private IJSObjectReference?                 _jsModule;
-    private bool                                _needsJsInit;
 
     private bool _showRowActions = true;
     private bool ShowRowActions
     {
         get => _showRowActions;
-        set { _showRowActions = value; _needsJsInit = true; }
+        set { _showRowActions = value; }
     }
 
     private int _fontSize    = 14;
@@ -50,21 +45,10 @@ public partial class AppGrid<TItem> : ComponentBase, IAsyncDisposable
     {
         if (_columns.Contains(col)) return;
         _columns.Add(col);
-        _needsJsInit = true;
         StateHasChanged();
     }
 
     internal void TriggerStateUpdate() => StateHasChanged();
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender || _needsJsInit)
-        {
-            _needsJsInit = false;
-            _jsModule ??= await JS.InvokeAsync<IJSObjectReference>("import", "/app-grid.js");
-            await _jsModule.InvokeVoidAsync("init", _tableId);
-        }
-    }
 
     // ── Row operations ──────────────────────────────────────────────────────
 
@@ -119,11 +103,5 @@ public partial class AppGrid<TItem> : ComponentBase, IAsyncDisposable
             StateHasChanged();
         }
         return OnDeleteSelected.HasDelegate ? OnDeleteSelected.InvokeAsync() : Task.CompletedTask;
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        if (_jsModule is not null)
-            try { await _jsModule.DisposeAsync(); } catch { /* ignore dispose errors */ }
     }
 }
