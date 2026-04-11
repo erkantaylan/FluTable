@@ -67,7 +67,6 @@
 /home/kamyon/Desktop/projects/fluenttable/obj/Debug/net10.0/compressed/kwrall9b0s-{0}-zbg73p58hc-zbg73p58hc.gz
 /home/kamyon/Desktop/projects/fluenttable/obj/Debug/net10.0/compressed/m3ffqup1h6-{0}-kz8gc8cxma-kz8gc8cxma.gz
 /home/kamyon/Desktop/projects/fluenttable/obj/Debug/net10.0/compressed/3emkb5z5ma-{0}-sd59ooda5f-sd59ooda5f.gz
-/home/kamyon/Desktop/projects/fluenttable/obj/Debug/net10.0/compressed/q3asbxfgyo-{0}-g5ndc3bl4h-g5ndc3bl4h.gz
 /home/kamyon/Desktop/projects/fluenttable/obj/Debug/net10.0/compressed/t7vbiwyqjc-{0}-a8m5cweeeb-a8m5cweeeb.gz
 /home/kamyon/Desktop/projects/fluenttable/obj/Debug/net10.0/compressed/k9a1ks4zk5-{0}-13ja33weya-13ja33weya.gz
 /home/kamyon/Desktop/projects/fluenttable/obj/Debug/net10.0/compressed/g907nc9e5r-{0}-o32v8r49vv-o32v8r49vv.gz
@@ -88,5 +87,6 @@
 /home/kamyon/Desktop/projects/fluenttable/obj/Debug/net10.0/compressed/y4shw1vqw8-{0}-q88t9wu7nx-q88t9wu7nx.gz
 /home/kamyon/Desktop/projects/fluenttable/obj/Debug/net10.0/scopedcss/Components/Shared/AppGrid.razor.rz.scp.css
 /home/kamyon/Desktop/projects/fluenttable/obj/Debug/net10.0/compressed/eu5nd62bfb-{0}-ft5xiyow41-ft5xiyow41.gz
-/home/kamyon/Desktop/projects/fluenttable/obj/Debug/net10.0/compressed/fanajiu706-{0}-3kv3en5lg3-3kv3en5lg3.gz
-/home/kamyon/Desktop/projects/fluenttable/obj/Debug/net10.0/compressed/8cidihfsmm-{0}-or781ah2an-or781ah2an.gz
+/home/kamyon/Desktop/projects/fluenttable/obj/Debug/net10.0/compressed/q3asbxfgyo-{0}-f32f6tzu4c-f32f6tzu4c.gz
+/home/kamyon/Desktop/projects/fluenttable/obj/Debug/net10.0/compressed/fanajiu706-{0}-7seog3zxvz-7seog3zxvz.gz
+/home/kamyon/Desktop/projects/fluenttable/obj/Debug/net10.0/compressed/8cidihfsmm-{0}-1dm91x3udg-1dm91x3udg.gz

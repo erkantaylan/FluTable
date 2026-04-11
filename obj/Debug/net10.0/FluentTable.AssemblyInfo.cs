@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FluentTable")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+51d67e8487ac19739afa148951f0efe1bac8ed20")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+74ff4c4ada64110650fe163d57609a5296b18da3")]
 [assembly: System.Reflection.AssemblyProductAttribute("FluentTable")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FluentTable")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

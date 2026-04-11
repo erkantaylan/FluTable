@@ -18,10 +18,4 @@
     internal RenderFragment? GetCellFor(TItem item) => CellTemplate?.Invoke(item);
 
     protected override void OnInitialized() => Grid?.RegisterColumn(this);
-
-    public override async Task SetParametersAsync(ParameterView parameters)
-    {
-        await base.SetParametersAsync(parameters);
-        Grid?.TriggerStateUpdate();
-    }
 }

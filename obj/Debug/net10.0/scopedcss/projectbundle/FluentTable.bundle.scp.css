@@ -162,6 +162,7 @@
     flex-direction: column;
     gap: 8px;
     width: 100%;
+    margin: var(--ag-margin, 0px);
 }
 
 .ag-toolbar[b-uy5nz7vfqc] {
@@ -242,12 +243,13 @@
 }
 
 .ag-td[b-uy5nz7vfqc] {
-    padding: 6px 12px;
+    padding: var(--ag-cell-padding, 4px) 0;
     border-bottom: 1px solid var(--neutral-stroke-divider-rest);
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
     vertical-align: top;
+    font-size: var(--ag-font-size, 14px);
 }
 
 .ag-multiline[b-uy5nz7vfqc] {
@@ -273,4 +275,41 @@
 
 .ag-row:hover .ag-row-actions[b-uy5nz7vfqc] {
     opacity: 1;
+}
+
+/* ── Settings group ───────────────────────── */
+
+.ag-settings[b-uy5nz7vfqc] {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-left: 8px;
+    padding-left: 12px;
+    border-left: 1px solid var(--neutral-stroke-rest);
+}
+
+.ag-setting[b-uy5nz7vfqc] {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: var(--neutral-foreground-rest);
+    cursor: default;
+    user-select: none;
+}
+
+.ag-setting-input[b-uy5nz7vfqc] {
+    width: 44px;
+    padding: 2px 4px;
+    font-size: 12px;
+    border: 1px solid var(--neutral-stroke-rest);
+    border-radius: 4px;
+    background: var(--neutral-fill-input-rest);
+    color: var(--neutral-foreground-rest);
+    text-align: center;
+    outline: none;
+}
+
+.ag-setting-input:focus[b-uy5nz7vfqc] {
+    border-color: var(--accent-fill-rest);
 }

@@ -6,7 +6,7 @@
     @ChildContent
 </CascadingValue>
 
-<div class="ag-wrapper">
+<div class="ag-wrapper" style="@WrapperStyle">
 
     @* ── Toolbar ─────────────────────────────────────────────── *@
     <div class="ag-toolbar">
@@ -24,6 +24,23 @@
                 Delete Selected
             </FluentButton>
         }
+
+        <FluentCheckbox @bind-Value="ShowRowActions" Label="Edit rows" />
+
+        <div class="ag-settings">
+            <label class="ag-setting">
+                <span>Font</span>
+                <input type="number" class="ag-setting-input" @bind="_fontSize" min="8" max="32" />
+            </label>
+            <label class="ag-setting">
+                <span>Padding</span>
+                <input type="number" class="ag-setting-input" @bind="_cellPadding" min="0" max="20" />
+            </label>
+            <label class="ag-setting">
+                <span>Margin</span>
+                <input type="number" class="ag-setting-input" @bind="_outerMargin" min="0" max="60" />
+            </label>
+        </div>
     </div>
 
     @* ── Table ───────────────────────────────────────────────── *@
@@ -37,7 +54,10 @@
                          class="@(col.IsFixed ? "ag-col-fixed" : "ag-col-flex")"
                          style="@(col.Width is not null ? $"width:{col.Width}" : "")" />
                 }
-                <col class="ag-col-fixed" style="width:96px" />
+                @if (ShowRowActions)
+                {
+                    <col class="ag-col-fixed" style="width:96px" />
+                }
             </colgroup>
 
             <thead>
@@ -61,7 +81,10 @@
                             }
                         </th>
                     }
-                    <th class="ag-th ag-th-fixed ag-th-actions"></th>
+                    @if (ShowRowActions)
+                    {
+                        <th class="ag-th ag-th-fixed ag-th-actions"></th>
+                    }
                 </tr>
             </thead>
 
@@ -78,22 +101,25 @@
                                 @col.GetCellFor(item)
                             </td>
                         }
-                        <td class="ag-td ag-td-actions">
-                            <div class="ag-row-actions">
-                                <FluentButton Appearance="Appearance.Stealth"
-                                              Title="Insert row above"
-                                              IconStart="@(new Icons.Regular.Size16.ArrowUp())"
-                                              OnClick="@(() => HandleInsertAbove(rowIndex))" />
-                                <FluentButton Appearance="Appearance.Stealth"
-                                              Title="Insert row below"
-                                              IconStart="@(new Icons.Regular.Size16.ArrowDown())"
-                                              OnClick="@(() => HandleInsertBelow(rowIndex))" />
-                                <FluentButton Appearance="Appearance.Stealth"
-                                              Title="Delete row"
-                                              IconStart="@(new Icons.Regular.Size16.Delete())"
-                                              OnClick="@(() => HandleDeleteRow(rowIndex))" />
-                            </div>
-                        </td>
+                        @if (ShowRowActions)
+                        {
+                            <td class="ag-td ag-td-actions">
+                                <div class="ag-row-actions">
+                                    <FluentButton Appearance="Appearance.Stealth"
+                                                  Title="Insert row above"
+                                                  IconStart="@(new Icons.Regular.Size16.ArrowUp())"
+                                                  OnClick="@(() => HandleInsertAbove(rowIndex))" />
+                                    <FluentButton Appearance="Appearance.Stealth"
+                                                  Title="Insert row below"
+                                                  IconStart="@(new Icons.Regular.Size16.ArrowDown())"
+                                                  OnClick="@(() => HandleInsertBelow(rowIndex))" />
+                                    <FluentButton Appearance="Appearance.Stealth"
+                                                  Title="Delete row"
+                                                  IconStart="@(new Icons.Regular.Size16.Delete())"
+                                                  OnClick="@(() => HandleDeleteRow(rowIndex))" />
+                                </div>
+                            </td>
+                        }
                     </tr>
                 }
             </tbody>

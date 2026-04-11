@@ -28,6 +28,20 @@ public partial class AppGrid<TItem> : ComponentBase, IAsyncDisposable
     private IJSObjectReference?                 _jsModule;
     private bool                                _needsJsInit;
 
+    private bool _showRowActions = true;
+    private bool ShowRowActions
+    {
+        get => _showRowActions;
+        set { _showRowActions = value; _needsJsInit = true; }
+    }
+
+    private int _fontSize    = 14;
+    private int _cellPadding = 4;
+    private int _outerMargin = 0;
+
+    private string WrapperStyle =>
+        $"--ag-font-size:{_fontSize}px;--ag-cell-padding:{_cellPadding}px;--ag-margin:{_outerMargin}px";
+
     private bool HasSelection =>
         IsSelectedSelector is not null && Items.Any(IsSelectedSelector);
 
