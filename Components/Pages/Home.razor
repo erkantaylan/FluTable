@@ -3,10 +3,45 @@
 
 <PageTitle>Home</PageTitle>
 
+<div class="demo-toolbar">
+    <FluentButton Appearance="Appearance.Accent"
+                  IconStart="@(new Icons.Regular.Size16.Add())"
+                  OnClick="AddRow">
+        Add Row
+    </FluentButton>
+
+    @if (_rows.Any(r => r.IsSelected))
+    {
+        <FluentButton Appearance="Appearance.Outline"
+                      IconStart="@(new Icons.Regular.Size16.Delete())"
+                      OnClick="DeleteSelected">
+            Delete Selected
+        </FluentButton>
+    }
+
+    <FluentCheckbox @bind-Value="_editMode" Label="Edit rows" />
+
+    <div class="demo-settings">
+        <label class="demo-setting">
+            <span>Font</span>
+            <input type="number" class="demo-setting-input" @bind="_fontSize" min="8" max="32" />
+        </label>
+        <label class="demo-setting">
+            <span>Padding</span>
+            <input type="number" class="demo-setting-input" @bind="_cellPadding" min="0" max="20" />
+        </label>
+        <label class="demo-setting">
+            <span>Margin</span>
+            <input type="number" class="demo-setting-input" @bind="_outerMargin" min="0" max="60" />
+        </label>
+    </div>
+</div>
+
+<div style="@_gridStyle">
 <FluTable TItem="TableRow"
          Items="@_rows"
-         NewRowFactory="@(() => new TableRow { Title = "New Row", Date = DateTime.Today })"
-         IsSelectedSelector="@(r => r.IsSelected)">
+         ShowRowActions="@_editMode"
+         NewRowFactory="@(() => new TableRow { Title = "New Row", Date = DateTime.Today })">
 
     <FluTableColumn TItem="TableRow" Header="" Width="40px" Resizable="false">
         <CellTemplate>
@@ -50,9 +85,23 @@
     </FluTableColumn>
 
 </FluTable>
+</div>
 
 @code {
-    private List<TableRow> _rows = SeedData.Generate(100);
+    private List<TableRow> _rows      = SeedData.Generate(100);
+    private bool           _editMode  = true;
+    private int            _fontSize     = 14;
+    private int            _cellPadding  = 4;
+    private int            _outerMargin  = 0;
+
+    private string _gridStyle =>
+        $"--ag-font-size:{_fontSize}px;--ag-cell-padding:{_cellPadding}px;--ag-margin:{_outerMargin}px";
+
+    private void AddRow() =>
+        _rows.Add(new TableRow { Title = "New Row", Date = DateTime.Today });
+
+    private void DeleteSelected() =>
+        _rows.RemoveAll(r => r.IsSelected);
 
     private sealed class TableRow
     {

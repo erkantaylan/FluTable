@@ -6,45 +6,7 @@
     @ChildContent
 </CascadingValue>
 
-<div class="ag-wrapper" style="@WrapperStyle">
-
-    @* ── Toolbar ─────────────────────────────────────────────── *@
-    <div class="ag-toolbar">
-        <button type="button" class="ag-btn ag-btn-accent" @onclick="HandleAddRow">
-            @IconAdd
-            <span>Add Row</span>
-        </button>
-
-        @if (HasSelection)
-        {
-            <button type="button" class="ag-btn ag-btn-outline" @onclick="HandleDeleteSelected">
-                @IconDelete
-                <span>Delete Selected</span>
-            </button>
-        }
-
-        <label class="ag-check">
-            <input type="checkbox" @bind="ShowRowActions" />
-            <span>Edit rows</span>
-        </label>
-
-        <div class="ag-settings">
-            <label class="ag-setting">
-                <span>Font</span>
-                <input type="number" class="ag-setting-input" @bind="_fontSize" min="8" max="32" />
-            </label>
-            <label class="ag-setting">
-                <span>Padding</span>
-                <input type="number" class="ag-setting-input" @bind="_cellPadding" min="0" max="20" />
-            </label>
-            <label class="ag-setting">
-                <span>Margin</span>
-                <input type="number" class="ag-setting-input" @bind="_outerMargin" min="0" max="60" />
-            </label>
-        </div>
-    </div>
-
-    @* ── Table ───────────────────────────────────────────────── *@
+<div class="ag-wrapper">
     <div class="ag-scroll">
         <table id="@_tableId" data-ag-table class="ag-table">
 

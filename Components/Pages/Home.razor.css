@@ -32,3 +32,47 @@
     color: var(--neutral-foreground-hint);
     font-weight: 400;
 }
+
+/* ── Demo toolbar ─────────────────────────── */
+
+.demo-toolbar {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 4px 0 12px 0;
+}
+
+.demo-settings {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-left: 8px;
+    padding-left: 12px;
+    border-left: 1px solid var(--neutral-stroke-rest);
+}
+
+.demo-setting {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: var(--neutral-foreground-rest);
+    cursor: default;
+    user-select: none;
+}
+
+.demo-setting-input {
+    width: 44px;
+    padding: 2px 4px;
+    font-size: 12px;
+    border: 1px solid var(--neutral-stroke-rest);
+    border-radius: 4px;
+    background: var(--neutral-fill-input-rest);
+    color: var(--neutral-foreground-rest);
+    text-align: center;
+    outline: none;
+}
+
+.demo-setting-input:focus {
+    border-color: var(--accent-fill-rest);
+}

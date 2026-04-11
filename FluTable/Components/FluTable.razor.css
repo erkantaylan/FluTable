@@ -1,16 +1,8 @@
 .ag-wrapper {
     display: flex;
     flex-direction: column;
-    gap: 8px;
     width: 100%;
     margin: var(--ag-margin, 0px);
-}
-
-.ag-toolbar {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    padding: 4px 0;
 }
 
 .ag-scroll {
@@ -23,85 +15,6 @@
     table-layout: fixed;
     border-collapse: collapse;
     border-spacing: 0;
-}
-
-/* ── Buttons ──────────────────────────────── */
-
-.ag-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 12px;
-    font-size: 13px;
-    font-family: inherit;
-    line-height: 1;
-    border: 1px solid transparent;
-    border-radius: 4px;
-    cursor: pointer;
-    user-select: none;
-    transition: background 0.1s, border-color 0.1s;
-}
-
-.ag-btn:focus-visible {
-    outline: 2px solid var(--accent-fill-rest, #0078d4);
-    outline-offset: 1px;
-}
-
-.ag-btn-accent {
-    background: var(--accent-fill-rest, #0078d4);
-    color: var(--foreground-on-accent-rest, #ffffff);
-}
-
-.ag-btn-accent:hover {
-    background: var(--accent-fill-hover, #106ebe);
-}
-
-.ag-btn-outline {
-    background: transparent;
-    color: var(--neutral-foreground-rest, #242424);
-    border-color: var(--neutral-stroke-rest, #d1d1d1);
-}
-
-.ag-btn-outline:hover {
-    background: var(--neutral-fill-secondary-hover, #f0f0f0);
-}
-
-.ag-btn-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
-    padding: 0;
-    background: transparent;
-    color: var(--neutral-foreground-rest, #242424);
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.ag-btn-icon:hover {
-    background: var(--neutral-fill-secondary-hover, #f0f0f0);
-}
-
-/* ── Checkbox ─────────────────────────────── */
-
-.ag-check {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 13px;
-    color: var(--neutral-foreground-rest, #242424);
-    cursor: pointer;
-    user-select: none;
-}
-
-.ag-check input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
-    margin: 0;
-    accent-color: var(--accent-fill-rest, #0078d4);
-    cursor: pointer;
 }
 
 /* ── Header ───────────────────────────────── */
@@ -197,39 +110,20 @@
     opacity: 1;
 }
 
-/* ── Settings group ───────────────────────── */
-
-.ag-settings {
-    display: flex;
-    gap: 12px;
+.ag-btn-icon {
+    display: inline-flex;
     align-items: center;
-    margin-left: 8px;
-    padding-left: 12px;
-    border-left: 1px solid var(--neutral-stroke-rest, #d1d1d1);
-}
-
-.ag-setting {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 12px;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    background: transparent;
     color: var(--neutral-foreground-rest, #242424);
-    cursor: default;
-    user-select: none;
-}
-
-.ag-setting-input {
-    width: 44px;
-    padding: 2px 4px;
-    font-size: 12px;
-    border: 1px solid var(--neutral-stroke-rest, #d1d1d1);
+    border: none;
     border-radius: 4px;
-    background: var(--neutral-fill-input-rest, #ffffff);
-    color: var(--neutral-foreground-rest, #242424);
-    text-align: center;
-    outline: none;
+    cursor: pointer;
 }
 
-.ag-setting-input:focus {
-    border-color: var(--accent-fill-rest, #0078d4);
+.ag-btn-icon:hover {
+    background: var(--neutral-fill-secondary-hover, #f0f0f0);
 }
