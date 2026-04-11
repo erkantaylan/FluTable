@@ -1,0 +1,130 @@
+@page "/"
+@rendermode InteractiveServer
+
+<PageTitle>Home</PageTitle>
+
+<FluentDataGrid Items="@_rows.AsQueryable()"
+                ResizableColumns="true"
+                MultiLine="true"
+                Style="width: 100%;">
+    <TemplateColumn Title="Selected" Width="54px" Class="col-checkbox">
+        <FluentCheckbox @bind-Value="context.IsSelected" />
+    </TemplateColumn>
+    <PropertyColumn Property="@(r => r.Title)" Title="Title" />
+    <TemplateColumn Title="Notes" Class="col-notes">
+        <div class="notes-cell">@context.Notes</div>
+    </TemplateColumn>
+    <PropertyColumn Property="@(r => r.Date)" Title="Date" Format="yyyy-MM-dd" />
+</FluentDataGrid>
+
+<style>
+    fluent-data-grid {
+        width: 100%;
+    }
+
+    fluent-data-grid-row {
+        align-items: start;
+    }
+
+    fluent-data-grid-cell.col-notes {
+        white-space: normal;
+        overflow: visible;
+        align-items: start;
+        padding-top: 8px;
+    }
+
+    fluent-data-grid-cell.col-checkbox {
+        align-items: center;
+    }
+
+    /* hide resize handle on the checkbox column header */
+    fluent-data-grid-cell[class~="col-checkbox"] .col-resize-handle {
+        display: none !important;
+        pointer-events: none;
+    }
+
+    .notes-cell {
+        white-space: pre-wrap;
+        word-break: break-word;
+        line-height: 1.5;
+    }
+</style>
+
+@code {
+    private List<TableRow> _rows = [];
+
+    protected override void OnInitialized()
+    {
+        _rows = SeedData.Generate(100);
+    }
+
+    private sealed class TableRow
+    {
+        public bool IsSelected { get; set; }
+        public string Title { get; set; } = "";
+        public string Notes { get; set; } = "";
+        public DateTime Date { get; set; }
+    }
+
+    private static class SeedData
+    {
+        private static readonly string[] Titles =
+        [
+            "Project Kickoff", "Design Review", "Sprint Planning", "Retrospective",
+            "Bug Triage", "Performance Audit", "Security Assessment", "Code Freeze",
+            "Release Candidate", "Post-Mortem", "Feature Brainstorm", "Architecture Meeting",
+            "Stakeholder Update", "User Research Session", "Accessibility Audit",
+            "API Integration", "Database Migration", "CI/CD Pipeline Setup",
+            "Documentation Sprint", "Tech Debt Review", "Capacity Planning",
+            "Onboarding Session", "Team Sync", "Quarterly Review"
+        ];
+
+        private static readonly string[] NoteLines =
+        [
+            "Initial scope discussed with stakeholders.\nAction items assigned to team leads.",
+            "Reviewed wireframes and provided feedback.\nDesign changes requested for mobile breakpoints.\nFollow-up scheduled for next Tuesday.",
+            "Backlog groomed and stories estimated.\nVelocity target set at 42 points.\nBlocking dependency identified — needs resolution before sprint start.",
+            "Team highlighted communication gaps.\nProcess improvements proposed:\n- Daily stand-ups capped at 15 minutes\n- Async updates via Slack\n- Bi-weekly demos",
+            "12 open bugs triaged.\n3 marked critical and assigned immediately.\nRemaining deferred to next release.",
+            "Load tests revealed p99 latency spike at 450 ms.\nRoot cause traced to N+1 query in user listing endpoint.\nFix planned for this sprint.",
+            "No critical vulnerabilities found.\n2 medium-risk items noted:\n- Dependency with known CVE\n- Missing rate limiting on login endpoint\nBoth addressed in security sprint.",
+            "All feature branches merged to main.\nOnly hotfix PRs accepted from this point.\nRelease notes drafted.",
+            "RC-1 built and deployed to staging.\nQA sign-off pending.\nExpected production deploy Friday 18:00 UTC.",
+            "Service outage lasted 42 minutes.\nRoot cause: misconfigured health check on new deployment.\nFix verified, runbook updated.",
+            "Brainstormed 8 new features for Q3.\nTop 3 voted by team:\n1. Dark mode\n2. Bulk export\n3. Custom dashboards",
+            "Microservices boundary decisions finalized.\nEvent sourcing chosen for order domain.\nADR written and committed.",
+            "Presented Q2 progress to VP.\nHighlighted 98.7% uptime.\nRisks flagged: staffing gap in August.",
+            "Conducted 5 user interviews.\nKey insight: users prefer inline editing over modal dialogs.\nFindings shared in Confluence.",
+            "Lighthouse scores improved to 94/100.\nFocus areas:\n- Contrast ratios\n- Keyboard navigation\n- Screen reader labels",
+            "REST endpoints documented in OpenAPI.\nClient SDK auto-generated.\nBreaking changes versioned under /v2.",
+            "3 tables migrated with zero downtime using shadow table strategy.\nRollback script tested and stored.",
+            "GitHub Actions pipeline configured.\nStages: build → test → lint → deploy.\nAverage run time: 4m 12s.",
+            "All API endpoints documented.\nReadme updated.\nChangelog entries reviewed and merged.",
+            "Identified 18 legacy components to refactor.\nEstimated effort: 6 sprints.\nPrioritized by coupling score.",
+            "Server capacity reviewed ahead of marketing campaign.\nAuto-scaling policies updated.\nLoad balancer limits increased.",
+            "New hire completed environment setup.\nPaired with senior for first week.\nAccess provisioned across all systems.",
+            "Weekly cross-team alignment.\nBlockers:\n- Shared service deployment delayed\n- Design assets not finalized\nEscalated to PM.",
+            "Q3 OKRs reviewed.\nTwo objectives on track.\nOne at risk — mitigation plan in progress.",
+        ];
+
+        public static List<TableRow> Generate(int count)
+        {
+            var rng = new Random(42);
+            var baseDate = new DateTime(2024, 1, 1);
+            var rows = new List<TableRow>(count);
+
+            for (int i = 0; i < count; i++)
+            {
+                rows.Add(new TableRow
+                {
+                    IsSelected = rng.Next(2) == 0,
+                    Title = $"{Titles[i % Titles.Length]} #{i + 1}",
+                    Notes = NoteLines[i % NoteLines.Length],
+                    Date = baseDate.AddDays(rng.Next(0, 730))
+                });
+            }
+
+            return rows;
+        }
+    }
+}
