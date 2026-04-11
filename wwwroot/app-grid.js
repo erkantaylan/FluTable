@@ -10,15 +10,32 @@ export function init(tableId) {
     const cols = [...table.querySelectorAll('col')];
     const ths  = [...table.querySelectorAll('thead th')];
 
-    // Convert every flex column's initial rendered width to a percentage.
-    // This is done once so all subsequent resize math stays in % and the
-    // table always fills 100% of its container.
+    // Clear any previously JS-set widths on flex columns, then switch to
+    // auto layout so the browser computes natural content-based widths.
+    // This fixes two things:
+    //   1. Checkbox column no longer bloats when the actions column is toggled
+    //      (old % widths no longer summing to 100% caused fixed layout to
+    //       proportionally scale ALL columns, including fixed-pixel ones).
+    //   2. Title and Date columns start at their natural content width instead
+    //      of an arbitrary equal share.
+    cols.forEach(c => {
+        if (c.classList.contains('ag-col-flex')) c.style.width = '';
+    });
+    table.style.tableLayout = 'auto';
+
+    // Reading offsetWidth forces a synchronous reflow, giving us the
+    // auto-computed column widths before we lock everything down.
     const tableWidth = table.offsetWidth;
+
     ths.forEach((th, i) => {
         if (i < cols.length && cols[i].classList.contains('ag-col-flex')) {
             cols[i].style.width = pct(th.offsetWidth, tableWidth);
         }
     });
+
+    // Lock into fixed layout so all subsequent resize math stays in %
+    // and the total always equals 100% of the container.
+    table.style.tableLayout = 'fixed';
 
     const ac = new AbortController();
     grids.set(tableId, ac);
@@ -35,23 +52,21 @@ export function init(tableId) {
             const nextIdx = findNextFlex(cols, colIdx + 1);
             if (nextIdx === -1) return;
 
-            const startX        = e.clientX;
-            const startW        = th.offsetWidth;
-            const startNextW    = ths[nextIdx].offsetWidth;
-            const minW          = 40;
+            const startX     = e.clientX;
+            const startW     = th.offsetWidth;
+            const startNextW = ths[nextIdx].offsetWidth;
+            const minW       = 40;
 
             handle.classList.add('dragging');
-            document.body.style.cursor    = 'col-resize';
+            document.body.style.cursor     = 'col-resize';
             document.body.style.userSelect = 'none';
 
             const onMove = (e) => {
-                const diff     = e.clientX - startX;
-                const newW     = Math.max(minW, startW + diff);
-                // Clamp so next column never goes below minW
-                const maxDiff  = startNextW - minW;
+                const diff        = e.clientX - startX;
+                const maxDiff     = startNextW - minW;
                 const clampedDiff = Math.min(diff, maxDiff);
-                const clampedW = Math.max(minW, startW + clampedDiff);
-                const newNextW = startNextW - clampedDiff;
+                const clampedW    = Math.max(minW, startW + clampedDiff);
+                const newNextW    = startNextW - clampedDiff;
 
                 const tw = table.offsetWidth;
                 cols[colIdx].style.width  = pct(clampedW,  tw);
@@ -60,7 +75,7 @@ export function init(tableId) {
 
             const onUp = () => {
                 handle.classList.remove('dragging');
-                document.body.style.cursor    = '';
+                document.body.style.cursor     = '';
                 document.body.style.userSelect = '';
                 document.removeEventListener('mousemove', onMove);
                 document.removeEventListener('mouseup',   onUp);
