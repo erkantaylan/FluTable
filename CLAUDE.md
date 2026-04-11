@@ -1,9 +1,10 @@
-# FluentTable Project
+# FluTable Project
 
 ## Stack
 - .NET 10, Blazor Web App (Server-side interactive), FluentUI Blazor v4.14
-- Created from `fluentblazor` template (`dotnet new fluentblazor`)
-- Single project (no Client/WASM split)
+- Two projects:
+  - **FluTable** (`FluTable/FluTable.csproj`) — standalone Razor Class Library, the grid component
+  - **FluTable.Demo** (`FluTable.Demo.csproj`) — the demo app that consumes the library
 
 ## Custom DataGrid Component
 
@@ -14,57 +15,59 @@ We built a fully custom generic DataGrid instead of using FluentDataGrid.
 
 | File | Purpose |
 |------|---------|
-| `Components/Shared/AppGrid.razor` | Template — table structure, toolbar, row actions |
-| `Components/Shared/AppGrid.razor.cs` | Code-behind — column registration, row ops, JS init |
-| `Components/Shared/AppGrid.razor.css` | Scoped styles using FluentUI CSS tokens |
-| `Components/Shared/AppGridColumn.razor` | Headless column definition, registers with parent via CascadingValue |
-| `wwwroot/app-grid.js` | Column resize JS — percentage-based, maintains 100% width |
+| `FluTable/Components/FluTable.razor` | Template — table structure, toolbar, row actions |
+| `FluTable/Components/FluTable.razor.cs` | Code-behind — column registration, row ops |
+| `FluTable/Components/FluTable.razor.css` | Scoped styles using FluentUI CSS tokens |
+| `FluTable/Components/FluTableColumn.razor` | Headless column definition, registers with parent via CascadingValue |
+| `FluTable/wwwroot/app-grid.js` | Column resize JS — percentage-based, maintains 100% width |
 
 ### How It Works
 
-**Column registration**: `AppGridColumn<TItem>` renders nothing. On `OnInitialized` it calls `Grid.RegisterColumn(this)` via a `CascadingValue`. The grid re-renders once columns are registered (two-pass render, normal Blazor pattern).
+**Column registration**: `FluTableColumn<TItem>` renders nothing. On `OnInitialized` it calls `Grid.RegisterColumn(this)` via a `CascadingValue`. The grid re-renders once columns are registered (two-pass render, normal Blazor pattern).
 
 **Resize logic** (`app-grid.js`):
-- On first `init(tableId)`, reads each flex column's `clientWidth` and converts to `%` of table width
+- On first init, reads each flex column's `clientWidth` and converts to `%` of table width
 - On drag: increases dragged column `%`, decreases the next flex column `%` to compensate
+- On double-click resize handle: auto-fits the column to its natural content width, then compensates from the next flex column
 - Total always = 100% — no MutationObserver hacks needed
 - Fixed columns (`ag-col-fixed`) are excluded from resize math
 - Uses `AbortController` for cleanup on re-init
+- Auto-initializes via MutationObserver on any `[data-ag-table]` element
 
 **Column types**:
 - Fixed/non-resizable: `Resizable="false"` or explicit `Width="40px"` → gets class `ag-col-fixed`, no resize handle
-- Flex/resizable: default → gets class `ag-col-flex`, resize handle shown in header
+- Flex/resizable: default → gets class `ag-col-flex`, resize handle shown in header. Last flex column has no handle (nothing to donate from).
 
 ### Usage
 
 ```razor
-<AppGrid TItem="MyModel"
-         Items="@_rows"
-         NewRowFactory="@(() => new MyModel())"
-         IsSelectedSelector="@(r => r.IsSelected)">
+<FluTable TItem="MyModel"
+          Items="@_rows"
+          NewRowFactory="@(() => new MyModel())"
+          IsSelectedSelector="@(r => r.IsSelected)">
 
-    <AppGridColumn TItem="MyModel" Header="" Width="40px" Resizable="false">
+    <FluTableColumn TItem="MyModel" Header="" Width="40px" Resizable="false">
         <CellTemplate>
             <FluentCheckbox @bind-Value="context.IsSelected" />
         </CellTemplate>
-    </AppGridColumn>
+    </FluTableColumn>
 
-    <AppGridColumn TItem="MyModel" Header="Title">
+    <FluTableColumn TItem="MyModel" Header="Title">
         <CellTemplate>@context.Title</CellTemplate>
-    </AppGridColumn>
+    </FluTableColumn>
 
-    <AppGridColumn TItem="MyModel" Header="Notes" Multiline="true">
+    <FluTableColumn TItem="MyModel" Header="Notes" Multiline="true">
         <CellTemplate>@context.Notes</CellTemplate>
-    </AppGridColumn>
+    </FluTableColumn>
 
-    <AppGridColumn TItem="MyModel" Header="Date">
+    <FluTableColumn TItem="MyModel" Header="Date">
         <CellTemplate>@context.Date.ToString("yyyy-MM-dd")</CellTemplate>
-    </AppGridColumn>
+    </FluTableColumn>
 
-</AppGrid>
+</FluTable>
 ```
 
-### Parameters — AppGrid
+### Parameters — FluTable
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
@@ -76,7 +79,7 @@ We built a fully custom generic DataGrid instead of using FluentDataGrid.
 | `OnDeleteRow` | `EventCallback<int>` | Fires after internal delete |
 | `OnDeleteSelected` | `EventCallback` | Fires after internal delete selected |
 
-### Parameters — AppGridColumn
+### Parameters — FluTableColumn
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
@@ -85,7 +88,7 @@ We built a fully custom generic DataGrid instead of using FluentDataGrid.
 | `Resizable` | `bool` | `true` | Whether resize handle appears |
 | `Multiline` | `bool` | `false` | `white-space: pre-wrap` on cells |
 | `CellTemplate` | `RenderFragment<TItem>?` | — | Cell content |
-| `HeaderTemplate` | `RenderFragment?` | — | Custom header content |
+| `HeaderTemplate` | `RenderFragment?` | — | Custom header content (any markup — icons, badges, etc.) |
 
 ### Row Actions (built-in)
 Each row shows three icon buttons on hover:
@@ -99,20 +102,20 @@ Toolbar shows:
 
 ## Current Home Page (`Components/Pages/Home.razor`)
 - `@rendermode InteractiveServer`
-- Uses `AppGrid<TableRow>` with 4 columns: checkbox, title, multiline notes, date
+- Uses `FluTable<TableRow>` with 4 columns: checkbox, title, multiline notes, date
+- All three content columns use `HeaderTemplate` with FluentUI icons, a row-count badge on Title, and a multi-line subtitle on Notes
 - 100 seed rows generated with `SeedData.Generate(100)` using `Random(42)`
 - `NewRowFactory` provided so the grid manages add/insert/delete internally
 
 ## Known Decisions
-- **No FluentDataGrid used** — replaced entirely with custom AppGrid
-- **FluentUI Blazor v4.14 still installed** — used for `FluentCheckbox`, `FluentButton`, design tokens
-- `ResizableColumns` parameter on `FluentDataGrid` does NOT exist on `TemplateColumn` or `PropertyColumn` in v4.14 (column-level, only grid-level)
-- `MultiLine="true"` is the correct attribute for multiline cells in FluentDataGrid (if ever used again)
+- **No FluentDataGrid used** — replaced entirely with custom FluTable
+- **FluentUI Blazor v4.14 installed in both projects** — library uses `FluentButton`, `FluentCheckbox`, and icons for the toolbar and row actions; demo uses them for cell templates
 - `@rendermode InteractiveServer` required on pages that use JS interop
+- Package script must be referenced from the consumer as `_content/FluTable/app-grid.js`
 
 ## Run & Build
 ```bash
-make run      # dotnet run
-make build    # dotnet build
-make rider    # open in JetBrains Rider
+make run      # dotnet run (from FluTable.Demo.csproj)
+make build    # dotnet build FluTable.slnx
+make rider    # open solution in JetBrains Rider
 ```

@@ -1,4 +1,4 @@
-using FluentTable.Components;
+using FluTable.Demo.Components;
 using Microsoft.FluentUI.AspNetCore.Components;
 
 var builder = WebApplication.CreateBuilder(args);

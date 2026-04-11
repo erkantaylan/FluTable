@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Components;
 
-namespace AppGrid.Components;
+namespace FluTable.Components;
 
-public partial class AppGrid<TItem> : ComponentBase
+public partial class FluTable<TItem> : ComponentBase
 {
     // Data
     [Parameter] public List<TItem>             Items      { get; set; } = [];
@@ -20,7 +20,7 @@ public partial class AppGrid<TItem> : ComponentBase
     [Parameter] public EventCallback<int>      OnDeleteRow         { get; set; }
     [Parameter] public EventCallback           OnDeleteSelected    { get; set; }
 
-    private readonly List<AppGridColumn<TItem>> _columns  = [];
+    private readonly List<FluTableColumn<TItem>> _columns  = [];
     private readonly string                     _tableId  = "ag-" + Guid.NewGuid().ToString("N")[..8];
 
     private bool _showRowActions = true;
@@ -40,8 +40,8 @@ public partial class AppGrid<TItem> : ComponentBase
     private bool HasSelection =>
         IsSelectedSelector is not null && Items.Any(IsSelectedSelector);
 
-    // Called by AppGridColumn<TItem>.OnInitialized
-    internal void RegisterColumn(AppGridColumn<TItem> col)
+    // Called by FluTableColumn<TItem>.OnInitialized
+    internal void RegisterColumn(FluTableColumn<TItem> col)
     {
         if (_columns.Contains(col)) return;
         _columns.Add(col);

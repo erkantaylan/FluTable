@@ -3,18 +3,18 @@
 
 <PageTitle>Home</PageTitle>
 
-<AppGrid TItem="TableRow"
+<FluTable TItem="TableRow"
          Items="@_rows"
          NewRowFactory="@(() => new TableRow { Title = "New Row", Date = DateTime.Today })"
          IsSelectedSelector="@(r => r.IsSelected)">
 
-    <AppGridColumn TItem="TableRow" Header="" Width="40px" Resizable="false">
+    <FluTableColumn TItem="TableRow" Header="" Width="40px" Resizable="false">
         <CellTemplate>
             <FluentCheckbox @bind-Value="context.IsSelected" />
         </CellTemplate>
-    </AppGridColumn>
+    </FluTableColumn>
 
-    <AppGridColumn TItem="TableRow" Header="Title">
+    <FluTableColumn TItem="TableRow" Header="Title">
         <HeaderTemplate>
             <span class="hdr-rich">
                 <FluentIcon Value="@(new Icons.Regular.Size16.Tag())" Color="Color.Accent" />
@@ -23,9 +23,9 @@
             </span>
         </HeaderTemplate>
         <CellTemplate>@context.Title</CellTemplate>
-    </AppGridColumn>
+    </FluTableColumn>
 
-    <AppGridColumn TItem="TableRow" Header="Notes" Multiline="true">
+    <FluTableColumn TItem="TableRow" Header="Notes" Multiline="true">
         <HeaderTemplate>
             <span class="hdr-rich hdr-stack">
                 <span class="hdr-row">
@@ -36,9 +36,9 @@
             </span>
         </HeaderTemplate>
         <CellTemplate>@context.Notes</CellTemplate>
-    </AppGridColumn>
+    </FluTableColumn>
 
-    <AppGridColumn TItem="TableRow" Header="Date">
+    <FluTableColumn TItem="TableRow" Header="Date">
         <HeaderTemplate>
             <span class="hdr-rich">
                 <FluentIcon Value="@(new Icons.Regular.Size16.CalendarLtr())" Color="Color.Accent" />
@@ -47,9 +47,9 @@
             </span>
         </HeaderTemplate>
         <CellTemplate>@context.Date.ToString("yyyy-MM-dd")</CellTemplate>
-    </AppGridColumn>
+    </FluTableColumn>
 
-</AppGrid>
+</FluTable>
 
 @code {
     private List<TableRow> _rows = SeedData.Generate(100);

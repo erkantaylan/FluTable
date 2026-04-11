@@ -13,13 +13,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="AppGrid\AppGrid.csproj" />
+    <ProjectReference Include="FluTable\FluTable.csproj" />
   </ItemGroup>
 
-  <!-- Exclude AppGrid sub-project sources from this project's compilation globs -->
+  <!-- Exclude FluTable sub-project sources from this project's compilation globs -->
   <ItemGroup>
-    <Compile Remove="AppGrid\**" />
-    <Content Remove="AppGrid\**" />
-    <None Remove="AppGrid\**" />
+    <Compile Remove="FluTable\**" />
+    <Content Remove="FluTable\**" />
+    <None Remove="FluTable\**" />
   </ItemGroup>
 </Project>

@@ -13,13 +13,13 @@ run:
 	dotnet run
 
 rider:
-	rider FluentTable.slnx
+	rider FluTable.slnx
 
 build:
-	dotnet build FluentTable.slnx
+	dotnet build FluTable.slnx
 
 clean:
-	dotnet clean FluentTable.slnx
+	dotnet clean FluTable.slnx
 
 restore:
-	dotnet restore FluentTable.slnx
+	dotnet restore FluTable.slnx

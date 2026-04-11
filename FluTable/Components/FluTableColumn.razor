@@ -1,10 +1,10 @@
 @typeparam TItem
-@namespace AppGrid.Components
+@namespace FluTable.Components
 
-@* Headless column definition — registers itself with the parent AppGrid, renders nothing *@
+@* Headless column definition — registers itself with the parent FluTable, renders nothing *@
 
 @code {
-    [CascadingParameter] private AppGrid<TItem>? Grid { get; set; }
+    [CascadingParameter] private FluTable<TItem>? Grid { get; set; }
 
     [Parameter, EditorRequired] public string Header { get; set; } = "";
     [Parameter] public string?           Width      { get; set; }
