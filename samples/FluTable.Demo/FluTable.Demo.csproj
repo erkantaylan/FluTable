@@ -13,13 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="FluTable\FluTable.csproj" />
+    <ProjectReference Include="..\..\src\FluTable\FluTable.csproj" />
   </ItemGroup>
 
-  <!-- Exclude FluTable sub-project sources from this project's compilation globs -->
-  <ItemGroup>
-    <Compile Remove="FluTable\**" />
-    <Content Remove="FluTable\**" />
-    <None Remove="FluTable\**" />
-  </ItemGroup>
 </Project>

@@ -1,4 +1,4 @@
 <Solution>
-  <Project Path="FluTable.Demo.csproj" />
-  <Project Path="FluTable/FluTable.csproj" />
+  <Project Path="src/FluTable/FluTable.csproj" />
+  <Project Path="samples/FluTable.Demo/FluTable.Demo.csproj" />
 </Solution>

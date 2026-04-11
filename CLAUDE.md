@@ -2,9 +2,36 @@
 
 ## Stack
 - .NET 10, Blazor Web App (Server-side interactive)
-- Two projects:
-  - **FluTable** (`FluTable/FluTable.csproj`) — standalone Razor Class Library, the grid component. **Zero external NuGet dependencies** — only `Microsoft.AspNetCore.App` FrameworkReference. Ships inline SVG icons and plain-HTML buttons/checkbox so consumers don't need FluentUI Blazor.
-  - **FluTable.Demo** (`FluTable.Demo.csproj`) — the demo app that consumes the library. Uses FluentUI Blazor v4.14 for its own page chrome (layout, cell templates).
+- Two projects, standard OSS layout:
+  - **src/FluTable** (`src/FluTable/FluTable.csproj`) — standalone Razor Class Library, the grid component. **Zero external NuGet dependencies** — only `Microsoft.AspNetCore.App` FrameworkReference. Ships inline SVG icons and plain HTML so consumers don't need FluentUI Blazor.
+  - **samples/FluTable.Demo** (`samples/FluTable.Demo/FluTable.Demo.csproj`) — the demo app that consumes the library. Uses FluentUI Blazor v4.14 for its own page chrome (layout, cell templates, toolbar).
+
+## Repo layout
+```
+/
+├── src/
+│   └── FluTable/              # the published NuGet library
+│       ├── FluTable.csproj
+│       ├── Components/
+│       │   ├── FluTable.razor, FluTable.razor.cs, FluTable.razor.css
+│       │   ├── FluTableColumn.razor
+│       │   └── _Imports.razor
+│       └── wwwroot/
+│           └── app-grid.js    # served as _content/FluTable/app-grid.js
+├── samples/
+│   └── FluTable.Demo/         # reference app that consumes the library
+│       ├── FluTable.Demo.csproj
+│       ├── Program.cs
+│       ├── Components/
+│       ├── wwwroot/
+│       ├── Properties/
+│       └── appsettings*.json
+├── README.md                  # shipped inside the NuGet package
+├── LICENSE                    # MIT
+├── FluTable.slnx              # references both projects
+├── Makefile                   # run / build / pack / push / publish
+└── .env                       # NUGET_KEY (gitignored)
+```
 
 ## Custom DataGrid Component
 
@@ -15,11 +42,11 @@ We built a fully custom generic DataGrid instead of using FluentDataGrid.
 
 | File | Purpose |
 |------|---------|
-| `FluTable/Components/FluTable.razor` | Template — table structure + hover-reveal row actions |
-| `FluTable/Components/FluTable.razor.cs` | Code-behind — column registration, row ops |
-| `FluTable/Components/FluTable.razor.css` | Scoped styles using FluentUI CSS tokens |
-| `FluTable/Components/FluTableColumn.razor` | Headless column definition, registers with parent via CascadingValue |
-| `FluTable/wwwroot/app-grid.js` | Column resize JS — percentage-based, maintains 100% width |
+| `src/FluTable/Components/FluTable.razor` | Template — table structure + hover-reveal row actions |
+| `src/FluTable/Components/FluTable.razor.cs` | Code-behind — column registration, row ops |
+| `src/FluTable/Components/FluTable.razor.css` | Scoped styles using FluentUI CSS tokens |
+| `src/FluTable/Components/FluTableColumn.razor` | Headless column definition, registers with parent via CascadingValue |
+| `src/FluTable/wwwroot/app-grid.js` | Column resize JS — percentage-based, maintains 100% width |
 
 ### How It Works
 
@@ -95,7 +122,7 @@ When `ShowRowActions="true"`, each row shows three icon buttons on hover (inline
 - **↓ Insert below** — inserts `NewRowFactory()` at `index + 1`
 - **Delete** — removes row at `index`
 
-There is no toolbar inside the library — Add Row, Delete Selected, and any edit-mode toggle live in the consuming app (see `Components/Pages/Home.razor` for the demo's version).
+There is no toolbar inside the library — Add Row, Delete Selected, and any edit-mode toggle live in the consuming app (see `samples/FluTable.Demo/Components/Pages/Home.razor` for the demo's version).
 
 ### Theming via CSS variables
 The library's scoped CSS reads these custom properties with fallbacks, so consumers can set them on any ancestor element and they cascade in:
@@ -105,7 +132,7 @@ The library's scoped CSS reads these custom properties with fallbacks, so consum
 
 It also reads FluentUI design tokens (`--accent-fill-rest`, `--neutral-foreground-rest`, etc.) with Microsoft-ish defaults via `var(--token, #fallback)` so it themes cleanly in FluentUI apps without depending on them.
 
-## Current Home Page (`Components/Pages/Home.razor`)
+## Current Home Page (`samples/FluTable.Demo/Components/Pages/Home.razor`)
 - `@rendermode InteractiveServer`
 - Uses `FluTable<TableRow>` with 4 columns: checkbox, title, multiline notes, date
 - All three content columns use `HeaderTemplate` with FluentUI icons, a row-count badge on Title, and a multi-line subtitle on Notes
@@ -115,14 +142,14 @@ It also reads FluentUI design tokens (`--accent-fill-rest`, `--neutral-foregroun
 ## Known Decisions
 - **No FluentDataGrid used** — replaced entirely with custom FluTable
 - **FluentUI Blazor only in the demo** — the library itself is dependency-free (only `Microsoft.AspNetCore.App`). Row-action buttons are plain `<button>` with inline SVG icons. CSS uses FluentUI tokens with `var(--token, #fallback)` so it themes cleanly with FluentUI and still looks acceptable without it.
-- **Toolbar is demo-level**, not library-level. Add Row / Delete Selected / Edit rows toggle / font-padding-margin settings all live in `Components/Pages/Home.razor` and drive the grid via its public parameters (`Items`, `ShowRowActions`, `NewRowFactory`) and wrapper-level CSS variables.
+- **Toolbar is demo-level**, not library-level. Add Row / Delete Selected / Edit rows toggle / font-padding-margin settings all live in `samples/FluTable.Demo/Components/Pages/Home.razor` and drive the grid via its public parameters (`Items`, `ShowRowActions`, `NewRowFactory`) and wrapper-level CSS variables.
 - `@rendermode InteractiveServer` required on pages that use JS interop
-- Package script must be referenced from the consumer as `_content/FluTable/app-grid.js` (demo wires this up in `Components/App.razor`)
+- Package script must be referenced from the consumer as `_content/FluTable/app-grid.js` (demo wires this up in `samples/FluTable.Demo/Components/App.razor`)
 
 ## NuGet package
 - **Published as** `FluTable` on https://www.nuget.org/packages/FluTable
-- **Current version**: `0.1.0` (metadata in `FluTable/FluTable.csproj` — PackageId, Version, Authors, Description, tags, `MIT` license expression, README path, project/repository URLs)
-- **README.md** at repo root is shipped inside the package via `<None Include="..\README.md" Pack="true" />`
+- **Current version**: `0.1.0` (metadata in `src/FluTable/FluTable.csproj` — PackageId, Version, Authors, Description, tags, `MIT` license expression, README path, project/repository URLs)
+- **README.md** at repo root is shipped inside the package via `<None Include="..\..\README.md" Pack="true" />`
 - **Symbols package** (`.snupkg`) is built alongside the `.nupkg` so consumers can step into source in their debugger
 - **XML docs** are generated, with CS1591 suppressed until the public API has full `///` coverage
 - **Publish secret** lives in `.env` at repo root (gitignored), format `NUGET_KEY=...`. Never pass the key on the command line — the Makefile reads `.env` automatically.
@@ -141,8 +168,8 @@ make rider     # open solution in JetBrains Rider
 
 ## NuGet publish flow
 ```bash
-make pack      # dotnet pack FluTable → FluTable/bin/Release/FluTable.X.Y.Z.nupkg
+make pack      # dotnet pack → src/FluTable/bin/Release/FluTable.X.Y.Z.nupkg
 make push      # push the newest non-symbols .nupkg to nuget.org (needs NUGET_KEY in .env)
 make publish   # pack + push in one shot
 ```
-To release a new version: bump `<Version>` in `FluTable/FluTable.csproj`, then `make publish`.
+To release a new version: bump `<Version>` in `src/FluTable/FluTable.csproj`, then `make publish`.

@@ -7,8 +7,9 @@ ifneq (,$(wildcard .env))
 endif
 
 # Paths
-LIB_PROJECT := FluTable/FluTable.csproj
-PACK_OUTPUT := FluTable/bin/Release
+LIB_PROJECT  := src/FluTable/FluTable.csproj
+DEMO_PROJECT := samples/FluTable.Demo/FluTable.Demo.csproj
+PACK_OUTPUT  := src/FluTable/bin/Release
 NUGET_SOURCE := https://api.nuget.org/v3/index.json
 
 help:
@@ -27,7 +28,7 @@ help:
 	@echo "  publish   pack + push"
 
 run:
-	dotnet run
+	dotnet run --project $(DEMO_PROJECT)
 
 rider:
 	rider FluTable.slnx
