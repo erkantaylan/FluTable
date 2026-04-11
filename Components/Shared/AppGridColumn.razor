@@ -1,0 +1,27 @@
+@typeparam TItem
+
+@* Headless column definition — registers itself with the parent AppGrid, renders nothing *@
+
+@code {
+    [CascadingParameter] private AppGrid<TItem>? Grid { get; set; }
+
+    [Parameter, EditorRequired] public string Header { get; set; } = "";
+    [Parameter] public string?           Width      { get; set; }
+    [Parameter] public bool              Resizable  { get; set; } = true;
+    [Parameter] public bool              Multiline  { get; set; } = false;
+    [Parameter] public RenderFragment<TItem>? CellTemplate   { get; set; }
+    [Parameter] public RenderFragment?        HeaderTemplate { get; set; }
+
+    internal string ColId   { get; } = "col-" + Guid.NewGuid().ToString("N")[..8];
+    internal bool   IsFixed => !Resizable;
+
+    internal RenderFragment? GetCellFor(TItem item) => CellTemplate?.Invoke(item);
+
+    protected override void OnInitialized() => Grid?.RegisterColumn(this);
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        await base.SetParametersAsync(parameters);
+        Grid?.TriggerStateUpdate();
+    }
+}

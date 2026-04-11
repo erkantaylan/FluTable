@@ -58,6 +58,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9Sb3V0ZXMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
+[/home/kamyon/Desktop/projects/fluenttable/Components/Shared/AppGridColumn.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWQvQXBwR3JpZENvbHVtbi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
 [/home/kamyon/Desktop/projects/fluenttable/Components/_Imports.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9fSW1wb3J0cy5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
@@ -65,3 +69,7 @@ build_metadata.AdditionalFiles.CssScope =
 [/home/kamyon/Desktop/projects/fluenttable/Components/Layout/ReconnectModal.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9MYXlvdXQvUmVjb25uZWN0TW9kYWwucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = b-kd08ryj2dj
+
+[/home/kamyon/Desktop/projects/fluenttable/Components/Shared/AppGrid.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWQvQXBwR3JpZC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = b-uy5nz7vfqc

@@ -1,0 +1,103 @@
+@typeparam TItem
+@namespace FluentTable.Components.Shared
+
+@* Register column definitions (they render nothing themselves) *@
+<CascadingValue Value="this" IsFixed="true">
+    @ChildContent
+</CascadingValue>
+
+<div class="ag-wrapper">
+
+    @* ── Toolbar ─────────────────────────────────────────────── *@
+    <div class="ag-toolbar">
+        <FluentButton Appearance="Appearance.Accent"
+                      IconStart="@(new Icons.Regular.Size16.Add())"
+                      OnClick="HandleAddRow">
+            Add Row
+        </FluentButton>
+
+        @if (HasSelection)
+        {
+            <FluentButton Appearance="Appearance.Outline"
+                          IconStart="@(new Icons.Regular.Size16.Delete())"
+                          OnClick="HandleDeleteSelected">
+                Delete Selected
+            </FluentButton>
+        }
+    </div>
+
+    @* ── Table ───────────────────────────────────────────────── *@
+    <div class="ag-scroll">
+        <table id="@_tableId" class="ag-table">
+
+            <colgroup>
+                @foreach (var col in _columns)
+                {
+                    <col id="@col.ColId"
+                         class="@(col.IsFixed ? "ag-col-fixed" : "ag-col-flex")"
+                         style="@(col.Width is not null ? $"width:{col.Width}" : "")" />
+                }
+                <col class="ag-col-fixed" style="width:96px" />
+            </colgroup>
+
+            <thead>
+                <tr class="ag-header-row">
+                    @foreach (var col in _columns)
+                    {
+                        <th class="ag-th @(col.IsFixed ? "ag-th-fixed" : "ag-th-resizable")">
+                            <span class="ag-th-label">
+                                @if (col.HeaderTemplate is not null)
+                                {
+                                    @col.HeaderTemplate
+                                }
+                                else
+                                {
+                                    @col.Header
+                                }
+                            </span>
+                            @if (!col.IsFixed)
+                            {
+                                <div class="ag-resize-handle"></div>
+                            }
+                        </th>
+                    }
+                    <th class="ag-th ag-th-fixed ag-th-actions"></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @for (var i = 0; i < Items.Count; i++)
+                {
+                    var item     = Items[i];
+                    var rowIndex = i;
+
+                    <tr class="ag-row">
+                        @foreach (var col in _columns)
+                        {
+                            <td class="ag-td @(col.Multiline ? "ag-multiline" : "")">
+                                @col.GetCellFor(item)
+                            </td>
+                        }
+                        <td class="ag-td ag-td-actions">
+                            <div class="ag-row-actions">
+                                <FluentButton Appearance="Appearance.Stealth"
+                                              Title="Insert row above"
+                                              IconStart="@(new Icons.Regular.Size16.ArrowUp())"
+                                              OnClick="@(() => HandleInsertAbove(rowIndex))" />
+                                <FluentButton Appearance="Appearance.Stealth"
+                                              Title="Insert row below"
+                                              IconStart="@(new Icons.Regular.Size16.ArrowDown())"
+                                              OnClick="@(() => HandleInsertBelow(rowIndex))" />
+                                <FluentButton Appearance="Appearance.Stealth"
+                                              Title="Delete row"
+                                              IconStart="@(new Icons.Regular.Size16.Delete())"
+                                              OnClick="@(() => HandleDeleteRow(rowIndex))" />
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+
+        </table>
+    </div>
+</div>

@@ -156,3 +156,121 @@
         opacity: 0;
     }
 }
+/* /Components/Shared/AppGrid.razor.rz.scp.css */
+.ag-wrapper[b-uy5nz7vfqc] {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
+
+.ag-toolbar[b-uy5nz7vfqc] {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 4px 0;
+}
+
+.ag-scroll[b-uy5nz7vfqc] {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.ag-table[b-uy5nz7vfqc] {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+/* ── Header ───────────────────────────────── */
+
+.ag-header-row[b-uy5nz7vfqc] {
+    background: var(--neutral-fill-secondary-rest);
+}
+
+.ag-th[b-uy5nz7vfqc] {
+    position: relative;
+    padding: 8px 12px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 12px;
+    border-bottom: 2px solid var(--neutral-stroke-rest);
+    white-space: nowrap;
+    overflow: hidden;
+    user-select: none;
+}
+
+.ag-th-label[b-uy5nz7vfqc] {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: 8px; /* space for resize handle */
+}
+
+.ag-th-actions[b-uy5nz7vfqc] {
+    width: 96px;
+}
+
+/* ── Resize handle ────────────────────────── */
+
+.ag-resize-handle[b-uy5nz7vfqc] {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 5px;
+    cursor: col-resize;
+    z-index: 1;
+    border-right: 2px solid transparent;
+    transition: border-color 0.15s;
+}
+
+.ag-resize-handle:hover[b-uy5nz7vfqc],
+.ag-resize-handle.dragging[b-uy5nz7vfqc] {
+    border-right-color: var(--accent-fill-rest);
+}
+
+/* ── Rows ─────────────────────────────────── */
+
+.ag-row:nth-child(even) .ag-td[b-uy5nz7vfqc] {
+    background: var(--neutral-fill-stealth-rest);
+}
+
+.ag-row:hover .ag-td[b-uy5nz7vfqc] {
+    background: var(--neutral-fill-secondary-hover);
+}
+
+.ag-td[b-uy5nz7vfqc] {
+    padding: 6px 12px;
+    border-bottom: 1px solid var(--neutral-stroke-divider-rest);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    vertical-align: top;
+}
+
+.ag-multiline[b-uy5nz7vfqc] {
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow: visible;
+}
+
+/* ── Row actions ──────────────────────────── */
+
+.ag-td-actions[b-uy5nz7vfqc] {
+    padding: 2px 4px;
+    overflow: visible;
+    vertical-align: middle;
+}
+
+.ag-row-actions[b-uy5nz7vfqc] {
+    display: flex;
+    gap: 0;
+    opacity: 0;
+    transition: opacity 0.1s;
+}
+
+.ag-row:hover .ag-row-actions[b-uy5nz7vfqc] {
+    opacity: 1;
+}

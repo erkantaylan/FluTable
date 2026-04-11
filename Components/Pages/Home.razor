@@ -1,84 +1,42 @@
 @page "/"
 @rendermode InteractiveServer
-@inject IJSRuntime JS
 
 <PageTitle>Home</PageTitle>
 
-<FluentDataGrid Items="@_rows.AsQueryable()"
-                ResizableColumns="true"
-                MultiLine="true"
-                GridTemplateColumns="40px 1fr 2fr 130px"
-                Style="width: 100%;">
-    <TemplateColumn Title="Selected" Class="col-checkbox">
-        <FluentCheckbox @bind-Value="context.IsSelected" />
-    </TemplateColumn>
-    <PropertyColumn Property="@(r => r.Title)" Title="Title" />
-    <TemplateColumn Title="Notes" Class="col-notes">
-        <div class="notes-cell">@context.Notes</div>
-    </TemplateColumn>
-    <PropertyColumn Property="@(r => r.Date)" Title="Date" Format="yyyy-MM-dd" />
-</FluentDataGrid>
+<AppGrid TItem="TableRow"
+         Items="@_rows"
+         NewRowFactory="@(() => new TableRow { Title = "New Row", Date = DateTime.Today })"
+         IsSelectedSelector="@(r => r.IsSelected)">
 
-<style>
-    fluent-data-grid {
-        width: 100%;
-    }
+    <AppGridColumn TItem="TableRow" Header="" Width="40px" Resizable="false">
+        <CellTemplate>
+            <FluentCheckbox @bind-Value="context.IsSelected" />
+        </CellTemplate>
+    </AppGridColumn>
 
-    fluent-data-grid-row {
-        align-items: start;
-    }
+    <AppGridColumn TItem="TableRow" Header="Title">
+        <CellTemplate>@context.Title</CellTemplate>
+    </AppGridColumn>
 
-    fluent-data-grid-cell.col-notes {
-        white-space: normal;
-        overflow: visible;
-        align-items: start;
-        padding-top: 8px;
-    }
+    <AppGridColumn TItem="TableRow" Header="Notes" Multiline="true">
+        <CellTemplate>@context.Notes</CellTemplate>
+    </AppGridColumn>
 
-    fluent-data-grid-cell.col-checkbox {
-        align-items: center;
-    }
+    <AppGridColumn TItem="TableRow" Header="Date">
+        <CellTemplate>@context.Date.ToString("yyyy-MM-dd")</CellTemplate>
+    </AppGridColumn>
 
-    /* hide resize handle on the checkbox column header */
-    fluent-data-grid-cell[class~="col-checkbox"] .col-resize-handle {
-        display: none !important;
-        pointer-events: none;
-    }
-
-    .notes-cell {
-        white-space: pre-wrap;
-        word-break: break-word;
-        line-height: 1.5;
-    }
-</style>
+</AppGrid>
 
 @code {
-    private List<TableRow> _rows = [];
-
-    protected override void OnInitialized()
-    {
-        _rows = SeedData.Generate(100);
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            // The DataGrid resize JS reads element.style.minWidth from the header cell to determine
-            // the minimum drag size. Override it to 40px so the checkbox column can't be widened
-            // and other columns can shrink next to it freely.
-            await JS.InvokeVoidAsync("eval",
-                "var h = document.querySelector('fluent-data-grid-cell.col-checkbox[role=columnheader]');" +
-                "if (h) { h.style.minWidth = '40px'; h.style.maxWidth = '40px'; }");
-        }
-    }
+    private List<TableRow> _rows = SeedData.Generate(100);
 
     private sealed class TableRow
     {
-        public bool IsSelected { get; set; }
-        public string Title { get; set; } = "";
-        public string Notes { get; set; } = "";
-        public DateTime Date { get; set; }
+        public bool     IsSelected { get; set; }
+        public string   Title      { get; set; } = "";
+        public string   Notes      { get; set; } = "";
+        public DateTime Date       { get; set; }
     }
 
     private static class SeedData
@@ -94,7 +52,7 @@
             "Onboarding Session", "Team Sync", "Quarterly Review"
         ];
 
-        private static readonly string[] NoteLines =
+        private static readonly string[] Notes =
         [
             "Initial scope discussed with stakeholders.\nAction items assigned to team leads.",
             "Reviewed wireframes and provided feedback.\nDesign changes requested for mobile breakpoints.\nFollow-up scheduled for next Tuesday.",
@@ -124,22 +82,15 @@
 
         public static List<TableRow> Generate(int count)
         {
-            var rng = new Random(42);
+            var rng      = new Random(42);
             var baseDate = new DateTime(2024, 1, 1);
-            var rows = new List<TableRow>(count);
-
-            for (int i = 0; i < count; i++)
+            return Enumerable.Range(0, count).Select(i => new TableRow
             {
-                rows.Add(new TableRow
-                {
-                    IsSelected = rng.Next(2) == 0,
-                    Title = $"{Titles[i % Titles.Length]} #{i + 1}",
-                    Notes = NoteLines[i % NoteLines.Length],
-                    Date = baseDate.AddDays(rng.Next(0, 730))
-                });
-            }
-
-            return rows;
+                IsSelected = rng.Next(2) == 0,
+                Title      = $"{Titles[i % Titles.Length]} #{i + 1}",
+                Notes      = Notes[i % Notes.Length],
+                Date       = baseDate.AddDays(rng.Next(0, 730))
+            }).ToList();
         }
     }
 }
