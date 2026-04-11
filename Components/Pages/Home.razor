@@ -1,13 +1,15 @@
 @page "/"
 @rendermode InteractiveServer
+@inject IJSRuntime JS
 
 <PageTitle>Home</PageTitle>
 
 <FluentDataGrid Items="@_rows.AsQueryable()"
                 ResizableColumns="true"
                 MultiLine="true"
+                GridTemplateColumns="40px 1fr 2fr 130px"
                 Style="width: 100%;">
-    <TemplateColumn Title="Selected" Width="54px" Class="col-checkbox">
+    <TemplateColumn Title="Selected" Class="col-checkbox">
         <FluentCheckbox @bind-Value="context.IsSelected" />
     </TemplateColumn>
     <PropertyColumn Property="@(r => r.Title)" Title="Title" />
@@ -56,6 +58,19 @@
     protected override void OnInitialized()
     {
         _rows = SeedData.Generate(100);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // The DataGrid resize JS reads element.style.minWidth from the header cell to determine
+            // the minimum drag size. Override it to 40px so the checkbox column can't be widened
+            // and other columns can shrink next to it freely.
+            await JS.InvokeVoidAsync("eval",
+                "var h = document.querySelector('fluent-data-grid-cell.col-checkbox[role=columnheader]');" +
+                "if (h) { h.style.minWidth = '40px'; h.style.maxWidth = '40px'; }");
+        }
     }
 
     private sealed class TableRow
