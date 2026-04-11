@@ -15,7 +15,7 @@ We built a fully custom generic DataGrid instead of using FluentDataGrid.
 
 | File | Purpose |
 |------|---------|
-| `FluTable/Components/FluTable.razor` | Template — table structure, toolbar, row actions |
+| `FluTable/Components/FluTable.razor` | Template — table structure + hover-reveal row actions |
 | `FluTable/Components/FluTable.razor.cs` | Code-behind — column registration, row ops |
 | `FluTable/Components/FluTable.razor.css` | Scoped styles using FluentUI CSS tokens |
 | `FluTable/Components/FluTableColumn.razor` | Headless column definition, registers with parent via CascadingValue |
@@ -43,12 +43,12 @@ We built a fully custom generic DataGrid instead of using FluentDataGrid.
 ```razor
 <FluTable TItem="MyModel"
           Items="@_rows"
-          NewRowFactory="@(() => new MyModel())"
-          IsSelectedSelector="@(r => r.IsSelected)">
+          ShowRowActions="@_editMode"
+          NewRowFactory="@(() => new MyModel())">
 
     <FluTableColumn TItem="MyModel" Header="" Width="40px" Resizable="false">
         <CellTemplate>
-            <FluentCheckbox @bind-Value="context.IsSelected" />
+            <input type="checkbox" @bind="context.IsSelected" />
         </CellTemplate>
     </FluTableColumn>
 
@@ -69,15 +69,14 @@ We built a fully custom generic DataGrid instead of using FluentDataGrid.
 
 ### Parameters — FluTable
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `Items` | `List<TItem>` | The data rows |
-| `NewRowFactory` | `Func<TItem>?` | If provided, grid handles add/insert internally |
-| `IsSelectedSelector` | `Func<TItem, bool>?` | Used to detect selection for "Delete Selected" button |
-| `OnAddRow` | `EventCallback` | Fires when no `NewRowFactory` is set |
-| `OnInsertAt` | `EventCallback<int>` | Fires insert at index when no factory |
-| `OnDeleteRow` | `EventCallback<int>` | Fires after internal delete |
-| `OnDeleteSelected` | `EventCallback` | Fires after internal delete selected |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `Items` | `List<TItem>` | `[]` | The data rows. Mutated in-place by row actions when `NewRowFactory` is set. |
+| `ChildContent` | `RenderFragment?` | — | Column definitions (`<FluTableColumn>` children) |
+| `NewRowFactory` | `Func<TItem>?` | `null` | When set, row-action insert buttons call this to produce new rows |
+| `ShowRowActions` | `bool` | `true` | Toggles the hover-reveal insert/delete icon column |
+| `OnInsertAt` | `EventCallback<int>` | — | Fired when `NewRowFactory` is null and the user inserts a row |
+| `OnDeleteRow` | `EventCallback<int>` | — | Fired after a row is deleted |
 
 ### Parameters — FluTableColumn
 
@@ -91,14 +90,20 @@ We built a fully custom generic DataGrid instead of using FluentDataGrid.
 | `HeaderTemplate` | `RenderFragment?` | — | Custom header content (any markup — icons, badges, etc.) |
 
 ### Row Actions (built-in)
-Each row shows three icon buttons on hover:
+When `ShowRowActions="true"`, each row shows three icon buttons on hover (inline SVG, no external icon pack):
 - **↑ Insert above** — inserts `NewRowFactory()` at `index`
 - **↓ Insert below** — inserts `NewRowFactory()` at `index + 1`
 - **Delete** — removes row at `index`
 
-Toolbar shows:
-- **Add Row** — appends `NewRowFactory()` to end
-- **Delete Selected** — removes all rows where `IsSelectedSelector` returns true (only visible when selection exists)
+There is no toolbar inside the library — Add Row, Delete Selected, and any edit-mode toggle live in the consuming app (see `Components/Pages/Home.razor` for the demo's version).
+
+### Theming via CSS variables
+The library's scoped CSS reads these custom properties with fallbacks, so consumers can set them on any ancestor element and they cascade in:
+- `--ag-font-size` (default `14px`) — body cell font size
+- `--ag-cell-padding` (default `4px`) — vertical padding on each body cell
+- `--ag-margin` (default `0px`) — outer margin on the grid wrapper
+
+It also reads FluentUI design tokens (`--accent-fill-rest`, `--neutral-foreground-rest`, etc.) with Microsoft-ish defaults via `var(--token, #fallback)` so it themes cleanly in FluentUI apps without depending on them.
 
 ## Current Home Page (`Components/Pages/Home.razor`)
 - `@rendermode InteractiveServer`
@@ -109,13 +114,35 @@ Toolbar shows:
 
 ## Known Decisions
 - **No FluentDataGrid used** — replaced entirely with custom FluTable
-- **FluentUI Blazor only in the demo** — the library itself is dependency-free. Toolbar buttons, row-action buttons, and the "Edit rows" checkbox are plain HTML with inline SVG icons. CSS uses FluentUI CSS tokens with fallback defaults via `var(--token, #fallback)`, so the library themes nicely when the consumer has FluentUI loaded and still looks acceptable when it doesn't.
+- **FluentUI Blazor only in the demo** — the library itself is dependency-free (only `Microsoft.AspNetCore.App`). Row-action buttons are plain `<button>` with inline SVG icons. CSS uses FluentUI tokens with `var(--token, #fallback)` so it themes cleanly with FluentUI and still looks acceptable without it.
+- **Toolbar is demo-level**, not library-level. Add Row / Delete Selected / Edit rows toggle / font-padding-margin settings all live in `Components/Pages/Home.razor` and drive the grid via its public parameters (`Items`, `ShowRowActions`, `NewRowFactory`) and wrapper-level CSS variables.
 - `@rendermode InteractiveServer` required on pages that use JS interop
-- Package script must be referenced from the consumer as `_content/FluTable/app-grid.js`
+- Package script must be referenced from the consumer as `_content/FluTable/app-grid.js` (demo wires this up in `Components/App.razor`)
+
+## NuGet package
+- **Published as** `FluTable` on https://www.nuget.org/packages/FluTable
+- **Current version**: `0.1.0` (metadata in `FluTable/FluTable.csproj` — PackageId, Version, Authors, Description, tags, `MIT` license expression, README path, project/repository URLs)
+- **README.md** at repo root is shipped inside the package via `<None Include="..\README.md" Pack="true" />`
+- **Symbols package** (`.snupkg`) is built alongside the `.nupkg` so consumers can step into source in their debugger
+- **XML docs** are generated, with CS1591 suppressed until the public API has full `///` coverage
+- **Publish secret** lives in `.env` at repo root (gitignored), format `NUGET_KEY=...`. Never pass the key on the command line — the Makefile reads `.env` automatically.
+
+## GitHub
+- Remote: `git@github.com:erkantaylan/FluTable.git` (branch `master`)
 
 ## Run & Build
 ```bash
-make run      # dotnet run (from FluTable.Demo.csproj)
-make build    # dotnet build FluTable.slnx
-make rider    # open solution in JetBrains Rider
+make run       # dotnet run (from FluTable.Demo.csproj)
+make build     # dotnet build FluTable.slnx
+make clean     # dotnet clean FluTable.slnx
+make restore   # dotnet restore FluTable.slnx
+make rider     # open solution in JetBrains Rider
 ```
+
+## NuGet publish flow
+```bash
+make pack      # dotnet pack FluTable → FluTable/bin/Release/FluTable.X.Y.Z.nupkg
+make push      # push the newest non-symbols .nupkg to nuget.org (needs NUGET_KEY in .env)
+make publish   # pack + push in one shot
+```
+To release a new version: bump `<Version>` in `FluTable/FluTable.csproj`, then `make publish`.
