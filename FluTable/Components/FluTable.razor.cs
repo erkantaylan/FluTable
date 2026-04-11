@@ -4,6 +4,12 @@ namespace FluTable.Components;
 
 public partial class FluTable<TItem> : ComponentBase
 {
+    // ── Inline SVG icons (no external dependency) ─────────────────────
+    private static readonly MarkupString IconAdd       = new("<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\"><path d=\"M8 3v10M3 8h10\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/></svg>");
+    private static readonly MarkupString IconDelete    = new("<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\"><path d=\"M3 4h10M6 4V3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v1M5 4v9a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1V4\" stroke=\"currentColor\" stroke-width=\"1.25\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>");
+    private static readonly MarkupString IconArrowUp   = new("<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\"><path d=\"M8 13V3M4 7l4-4 4 4\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>");
+    private static readonly MarkupString IconArrowDown = new("<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\"><path d=\"M8 3v10M4 9l4 4 4-4\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>");
+
     // Data
     [Parameter] public List<TItem>             Items      { get; set; } = [];
     [Parameter] public RenderFragment?         ChildContent { get; set; }

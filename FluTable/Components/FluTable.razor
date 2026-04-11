@@ -10,22 +10,23 @@
 
     @* ── Toolbar ─────────────────────────────────────────────── *@
     <div class="ag-toolbar">
-        <FluentButton Appearance="Appearance.Accent"
-                      IconStart="@(new Icons.Regular.Size16.Add())"
-                      OnClick="HandleAddRow">
-            Add Row
-        </FluentButton>
+        <button type="button" class="ag-btn ag-btn-accent" @onclick="HandleAddRow">
+            @IconAdd
+            <span>Add Row</span>
+        </button>
 
         @if (HasSelection)
         {
-            <FluentButton Appearance="Appearance.Outline"
-                          IconStart="@(new Icons.Regular.Size16.Delete())"
-                          OnClick="HandleDeleteSelected">
-                Delete Selected
-            </FluentButton>
+            <button type="button" class="ag-btn ag-btn-outline" @onclick="HandleDeleteSelected">
+                @IconDelete
+                <span>Delete Selected</span>
+            </button>
         }
 
-        <FluentCheckbox @bind-Value="ShowRowActions" Label="Edit rows" />
+        <label class="ag-check">
+            <input type="checkbox" @bind="ShowRowActions" />
+            <span>Edit rows</span>
+        </label>
 
         <div class="ag-settings">
             <label class="ag-setting">
@@ -110,18 +111,12 @@
                         {
                             <td class="ag-td ag-td-actions">
                                 <div class="ag-row-actions">
-                                    <FluentButton Appearance="Appearance.Stealth"
-                                                  Title="Insert row above"
-                                                  IconStart="@(new Icons.Regular.Size16.ArrowUp())"
-                                                  OnClick="@(() => HandleInsertAbove(rowIndex))" />
-                                    <FluentButton Appearance="Appearance.Stealth"
-                                                  Title="Insert row below"
-                                                  IconStart="@(new Icons.Regular.Size16.ArrowDown())"
-                                                  OnClick="@(() => HandleInsertBelow(rowIndex))" />
-                                    <FluentButton Appearance="Appearance.Stealth"
-                                                  Title="Delete row"
-                                                  IconStart="@(new Icons.Regular.Size16.Delete())"
-                                                  OnClick="@(() => HandleDeleteRow(rowIndex))" />
+                                    <button type="button" class="ag-btn-icon" title="Insert row above"
+                                            @onclick="@(() => HandleInsertAbove(rowIndex))">@IconArrowUp</button>
+                                    <button type="button" class="ag-btn-icon" title="Insert row below"
+                                            @onclick="@(() => HandleInsertBelow(rowIndex))">@IconArrowDown</button>
+                                    <button type="button" class="ag-btn-icon" title="Delete row"
+                                            @onclick="@(() => HandleDeleteRow(rowIndex))">@IconDelete</button>
                                 </div>
                             </td>
                         }

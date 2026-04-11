@@ -25,10 +25,89 @@
     border-spacing: 0;
 }
 
+/* ── Buttons ──────────────────────────────── */
+
+.ag-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    font-size: 13px;
+    font-family: inherit;
+    line-height: 1;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.1s, border-color 0.1s;
+}
+
+.ag-btn:focus-visible {
+    outline: 2px solid var(--accent-fill-rest, #0078d4);
+    outline-offset: 1px;
+}
+
+.ag-btn-accent {
+    background: var(--accent-fill-rest, #0078d4);
+    color: var(--foreground-on-accent-rest, #ffffff);
+}
+
+.ag-btn-accent:hover {
+    background: var(--accent-fill-hover, #106ebe);
+}
+
+.ag-btn-outline {
+    background: transparent;
+    color: var(--neutral-foreground-rest, #242424);
+    border-color: var(--neutral-stroke-rest, #d1d1d1);
+}
+
+.ag-btn-outline:hover {
+    background: var(--neutral-fill-secondary-hover, #f0f0f0);
+}
+
+.ag-btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    background: transparent;
+    color: var(--neutral-foreground-rest, #242424);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.ag-btn-icon:hover {
+    background: var(--neutral-fill-secondary-hover, #f0f0f0);
+}
+
+/* ── Checkbox ─────────────────────────────── */
+
+.ag-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--neutral-foreground-rest, #242424);
+    cursor: pointer;
+    user-select: none;
+}
+
+.ag-check input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: var(--accent-fill-rest, #0078d4);
+    cursor: pointer;
+}
+
 /* ── Header ───────────────────────────────── */
 
 .ag-header-row {
-    background: var(--neutral-fill-secondary-rest);
+    background: var(--neutral-fill-secondary-rest, #f5f5f5);
 }
 
 .ag-th {
@@ -37,7 +116,7 @@
     text-align: left;
     font-weight: 600;
     font-size: 12px;
-    border-bottom: 2px solid var(--neutral-stroke-rest);
+    border-bottom: 2px solid var(--neutral-stroke-rest, #d1d1d1);
     white-space: nowrap;
     overflow: hidden;
     user-select: none;
@@ -70,22 +149,22 @@
 
 .ag-resize-handle:hover,
 .ag-resize-handle.dragging {
-    border-right-color: var(--accent-fill-rest);
+    border-right-color: var(--accent-fill-rest, #0078d4);
 }
 
 /* ── Rows ─────────────────────────────────── */
 
 .ag-row:nth-child(even) .ag-td {
-    background: var(--neutral-fill-stealth-rest);
+    background: var(--neutral-fill-stealth-rest, #fafafa);
 }
 
 .ag-row:hover .ag-td {
-    background: var(--neutral-fill-secondary-hover);
+    background: var(--neutral-fill-secondary-hover, #f0f0f0);
 }
 
 .ag-td {
     padding: var(--ag-cell-padding, 4px) 0;
-    border-bottom: 1px solid var(--neutral-stroke-divider-rest);
+    border-bottom: 1px solid var(--neutral-stroke-divider-rest, #e5e5e5);
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -126,7 +205,7 @@
     align-items: center;
     margin-left: 8px;
     padding-left: 12px;
-    border-left: 1px solid var(--neutral-stroke-rest);
+    border-left: 1px solid var(--neutral-stroke-rest, #d1d1d1);
 }
 
 .ag-setting {
@@ -134,7 +213,7 @@
     align-items: center;
     gap: 5px;
     font-size: 12px;
-    color: var(--neutral-foreground-rest);
+    color: var(--neutral-foreground-rest, #242424);
     cursor: default;
     user-select: none;
 }
@@ -143,14 +222,14 @@
     width: 44px;
     padding: 2px 4px;
     font-size: 12px;
-    border: 1px solid var(--neutral-stroke-rest);
+    border: 1px solid var(--neutral-stroke-rest, #d1d1d1);
     border-radius: 4px;
-    background: var(--neutral-fill-input-rest);
-    color: var(--neutral-foreground-rest);
+    background: var(--neutral-fill-input-rest, #ffffff);
+    color: var(--neutral-foreground-rest, #242424);
     text-align: center;
     outline: none;
 }
 
 .ag-setting-input:focus {
-    border-color: var(--accent-fill-rest);
+    border-color: var(--accent-fill-rest, #0078d4);
 }

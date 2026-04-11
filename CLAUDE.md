@@ -1,10 +1,10 @@
 # FluTable Project
 
 ## Stack
-- .NET 10, Blazor Web App (Server-side interactive), FluentUI Blazor v4.14
+- .NET 10, Blazor Web App (Server-side interactive)
 - Two projects:
-  - **FluTable** (`FluTable/FluTable.csproj`) — standalone Razor Class Library, the grid component
-  - **FluTable.Demo** (`FluTable.Demo.csproj`) — the demo app that consumes the library
+  - **FluTable** (`FluTable/FluTable.csproj`) — standalone Razor Class Library, the grid component. **Zero external NuGet dependencies** — only `Microsoft.AspNetCore.App` FrameworkReference. Ships inline SVG icons and plain-HTML buttons/checkbox so consumers don't need FluentUI Blazor.
+  - **FluTable.Demo** (`FluTable.Demo.csproj`) — the demo app that consumes the library. Uses FluentUI Blazor v4.14 for its own page chrome (layout, cell templates).
 
 ## Custom DataGrid Component
 
@@ -109,7 +109,7 @@ Toolbar shows:
 
 ## Known Decisions
 - **No FluentDataGrid used** — replaced entirely with custom FluTable
-- **FluentUI Blazor v4.14 installed in both projects** — library uses `FluentButton`, `FluentCheckbox`, and icons for the toolbar and row actions; demo uses them for cell templates
+- **FluentUI Blazor only in the demo** — the library itself is dependency-free. Toolbar buttons, row-action buttons, and the "Edit rows" checkbox are plain HTML with inline SVG icons. CSS uses FluentUI CSS tokens with fallback defaults via `var(--token, #fallback)`, so the library themes nicely when the consumer has FluentUI loaded and still looks acceptable when it doesn't.
 - `@rendermode InteractiveServer` required on pages that use JS interop
 - Package script must be referenced from the consumer as `_content/FluTable/app-grid.js`
 
