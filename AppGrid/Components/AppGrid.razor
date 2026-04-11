@@ -62,8 +62,13 @@
 
             <thead>
                 <tr class="ag-header-row">
-                    @foreach (var col in _columns)
+                    @{
+                        var lastFlexIdx = _columns.FindLastIndex(c => !c.IsFixed);
+                    }
+                    @for (var ci = 0; ci < _columns.Count; ci++)
                     {
+                        var col = _columns[ci];
+                        var showHandle = !col.IsFixed && ci != lastFlexIdx;
                         <th class="ag-th @(col.IsFixed ? "ag-th-fixed" : "ag-th-resizable")">
                             <span class="ag-th-label">
                                 @if (col.HeaderTemplate is not null)
@@ -75,7 +80,7 @@
                                     @col.Header
                                 }
                             </span>
-                            @if (!col.IsFixed)
+                            @if (showHandle)
                             {
                                 <div class="ag-resize-handle"></div>
                             }

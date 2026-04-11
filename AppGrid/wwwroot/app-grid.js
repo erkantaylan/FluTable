@@ -68,8 +68,13 @@ function initTable(table) {
         const handle = th.querySelector('.ag-resize-handle');
         if (!handle) return;
 
+        handle.addEventListener('dblclick', e => {
+            e.preventDefault();
+            autoFitColumn(table, colIdx, cols, ths);
+        }, { signal: ac.signal });
+
         handle.addEventListener('mousedown', e => {
-            if (e.button !== 0) return;
+            if (e.button !== 0 || e.detail > 1) return;
 
             const nextIdx = findNextFlex(cols, colIdx + 1);
             if (nextIdx === -1) return;
@@ -145,6 +150,66 @@ function redistributeFlex(table, cols, ths) {
     flexItems.forEach(({ col, w }) => {
         col.style.width = pct(w / flexTotal * available, tableWidth);
     });
+}
+
+// ── Auto-fit a column to its natural content width ────────────────────────
+// Temporarily shrinks the column so scrollWidth reveals the true natural width,
+// overrides wrap on multiline cells, measures, then applies the delta by
+// taking/giving space from the next flex column (same compensation as drag).
+
+function autoFitColumn(table, colIdx, cols, ths) {
+    if (!cols[colIdx]?.classList.contains('ag-col-flex')) return;
+    const nextIdx = findNextFlex(cols, colIdx + 1);
+    if (nextIdx === -1) return;
+
+    const tw         = table.offsetWidth;
+    const startW     = ths[colIdx].offsetWidth;
+    const startNextW = ths[nextIdx].offsetWidth;
+    const minW       = 40;
+
+    // Gather cells in target column
+    const tbody = table.querySelector(':scope > tbody');
+    const cells = [];
+    if (tbody) {
+        for (const row of tbody.children) {
+            const cell = row.children[colIdx];
+            if (cell) cells.push(cell);
+        }
+    }
+
+    // Save state & shrink target so scrollWidth reveals natural content size;
+    // dump freed width into the next flex column so total stays ~100%.
+    const origTargetW = cols[colIdx].style.width;
+    const origNextW   = cols[nextIdx].style.width;
+    const origWS      = cells.map(c => c.style.whiteSpace);
+
+    const targetPct = parseFloat(origTargetW) || 0;
+    const nextPct   = parseFloat(origNextW)   || 0;
+    cols[colIdx].style.width  = '1px';
+    cols[nextIdx].style.width = (targetPct + nextPct) + '%';
+    cells.forEach(c => { c.style.whiteSpace = 'nowrap'; });
+
+    // Measure natural width from header + every cell
+    let naturalW = ths[colIdx].scrollWidth;
+    for (const cell of cells) {
+        if (cell.scrollWidth > naturalW) naturalW = cell.scrollWidth;
+    }
+
+    // Restore
+    cols[colIdx].style.width  = origTargetW;
+    cols[nextIdx].style.width = origNextW;
+    cells.forEach((c, i) => { c.style.whiteSpace = origWS[i]; });
+
+    naturalW += 4; // safety pad against ellipsis edge
+
+    // Clamp diff so neither column goes below minW (same rules as drag)
+    const rawDiff     = naturalW - startW;
+    const maxDiff     = startNextW - minW;
+    const minDiff     = -(startW - minW);
+    const clampedDiff = Math.min(Math.max(rawDiff, minDiff), maxDiff);
+
+    cols[colIdx].style.width  = pct(startW + clampedDiff, tw);
+    cols[nextIdx].style.width = pct(startNextW - clampedDiff, tw);
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────
