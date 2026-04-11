@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="FluentTable.csproj" />
+  <Project Path="AppGrid/AppGrid.csproj" />
+</Solution>
