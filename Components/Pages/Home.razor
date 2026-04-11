@@ -15,14 +15,37 @@
     </AppGridColumn>
 
     <AppGridColumn TItem="TableRow" Header="Title">
+        <HeaderTemplate>
+            <span class="hdr-rich">
+                <FluentIcon Value="@(new Icons.Regular.Size16.Tag())" Color="Color.Accent" />
+                <strong>Title</strong>
+                <span class="hdr-badge">@_rows.Count</span>
+            </span>
+        </HeaderTemplate>
         <CellTemplate>@context.Title</CellTemplate>
     </AppGridColumn>
 
     <AppGridColumn TItem="TableRow" Header="Notes" Multiline="true">
+        <HeaderTemplate>
+            <span class="hdr-rich hdr-stack">
+                <span class="hdr-row">
+                    <FluentIcon Value="@(new Icons.Regular.Size16.Notebook())" Color="Color.Accent" />
+                    <strong>Notes</strong>
+                </span>
+                <em class="hdr-sub">supports multi-line text</em>
+            </span>
+        </HeaderTemplate>
         <CellTemplate>@context.Notes</CellTemplate>
     </AppGridColumn>
 
     <AppGridColumn TItem="TableRow" Header="Date">
+        <HeaderTemplate>
+            <span class="hdr-rich">
+                <FluentIcon Value="@(new Icons.Regular.Size16.CalendarLtr())" Color="Color.Accent" />
+                <strong>Date</strong>
+                <span class="hdr-sub">(yyyy-MM-dd)</span>
+            </span>
+        </HeaderTemplate>
         <CellTemplate>@context.Date.ToString("yyyy-MM-dd")</CellTemplate>
     </AppGridColumn>
 

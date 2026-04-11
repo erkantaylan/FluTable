@@ -1,0 +1,34 @@
+.hdr-rich {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.hdr-stack {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    line-height: 1.1;
+}
+
+.hdr-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.hdr-badge {
+    background: var(--accent-fill-rest);
+    color: var(--foreground-on-accent-rest);
+    border-radius: 10px;
+    padding: 1px 8px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.hdr-sub {
+    font-size: 11px;
+    font-style: italic;
+    color: var(--neutral-foreground-hint);
+    font-weight: 400;
+}
