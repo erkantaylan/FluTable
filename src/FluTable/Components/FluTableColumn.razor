@@ -10,9 +10,14 @@
     [Parameter] public string?           Width      { get; set; }
     [Parameter] public bool              Resizable  { get; set; } = true;
     [Parameter] public bool              Multiline  { get; set; } = false;
+    [Parameter] public bool              OverflowTooltip { get; set; } = false;
     [Parameter] public RenderFragment<TItem>? CellTemplate   { get; set; }
     [Parameter] public RenderFragment?        HeaderTemplate { get; set; }
 
+    [Parameter] public Func<TItem, object?>? SortBy   { get; set; }
+    [Parameter] public IComparer<TItem>?     Comparer { get; set; }
+
+    internal bool   Sortable => SortBy != null || Comparer != null;
     internal string ColId   { get; } = "col-" + Guid.NewGuid().ToString("N")[..8];
     internal bool   IsFixed => !Resizable;
 

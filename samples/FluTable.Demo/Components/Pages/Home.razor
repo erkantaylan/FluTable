@@ -20,6 +20,7 @@
     }
 
     <FluentCheckbox @bind-Value="_editMode" Label="Edit rows" />
+    <FluentCheckbox @bind-Value="_showEmpty" Label="Show empty state" />
 
     <div class="demo-settings">
         <label class="demo-setting">
@@ -39,57 +40,72 @@
 
 <div style="@_gridStyle">
 <FluTable TItem="TableRow"
-         Items="@_rows"
+         Items="@(_showEmpty ? _emptyRows : _rows)"
          ShowRowActions="@_editMode"
          NewRowFactory="@(() => new TableRow { Title = "New Row", Date = DateTime.Today })">
 
-    <FluTableColumn TItem="TableRow" Header="" Width="40px" Resizable="false">
-        <CellTemplate>
-            <FluentCheckbox @bind-Value="context.IsSelected" />
-        </CellTemplate>
-    </FluTableColumn>
+    <EmptyContent>
+        <div class="demo-empty">
+            <FluentIcon Value="@(new Icons.Regular.Size24.Search())" Color="Color.Neutral" />
+            <div><strong>No rows to show</strong></div>
+            <div class="hdr-sub">Try toggling the "Show empty state" switch off.</div>
+        </div>
+    </EmptyContent>
 
-    <FluTableColumn TItem="TableRow" Header="Title">
-        <HeaderTemplate>
-            <span class="hdr-rich">
-                <FluentIcon Value="@(new Icons.Regular.Size16.Tag())" Color="Color.Accent" />
-                <strong>Title</strong>
-                <span class="hdr-badge">@_rows.Count</span>
-            </span>
-        </HeaderTemplate>
-        <CellTemplate>@context.Title</CellTemplate>
-    </FluTableColumn>
+    <ChildContent>
+        <FluTableColumn TItem="TableRow" Header="" Width="40px" Resizable="false">
+            <CellTemplate>
+                <FluentCheckbox @bind-Value="context.IsSelected" />
+            </CellTemplate>
+        </FluTableColumn>
 
-    <FluTableColumn TItem="TableRow" Header="Notes" Multiline="true">
-        <HeaderTemplate>
-            <span class="hdr-rich hdr-stack">
-                <span class="hdr-row">
-                    <FluentIcon Value="@(new Icons.Regular.Size16.Notebook())" Color="Color.Accent" />
-                    <strong>Notes</strong>
+        <FluTableColumn TItem="TableRow" Header="Title"
+                        SortBy="@(r => r.Title)"
+                        OverflowTooltip="true">
+            <HeaderTemplate>
+                <span class="hdr-rich">
+                    <FluentIcon Value="@(new Icons.Regular.Size16.Tag())" Color="Color.Accent" />
+                    <strong>Title</strong>
+                    <span class="hdr-badge">@_rows.Count</span>
                 </span>
-                <em class="hdr-sub">supports multi-line text</em>
-            </span>
-        </HeaderTemplate>
-        <CellTemplate>@context.Notes</CellTemplate>
-    </FluTableColumn>
+            </HeaderTemplate>
+            <CellTemplate>@context.Title</CellTemplate>
+        </FluTableColumn>
 
-    <FluTableColumn TItem="TableRow" Header="Date">
-        <HeaderTemplate>
-            <span class="hdr-rich">
-                <FluentIcon Value="@(new Icons.Regular.Size16.CalendarLtr())" Color="Color.Accent" />
-                <strong>Date</strong>
-                <span class="hdr-sub">(yyyy-MM-dd)</span>
-            </span>
-        </HeaderTemplate>
-        <CellTemplate>@context.Date.ToString("yyyy-MM-dd")</CellTemplate>
-    </FluTableColumn>
+        <FluTableColumn TItem="TableRow" Header="Notes" Multiline="true">
+            <HeaderTemplate>
+                <span class="hdr-rich hdr-stack">
+                    <span class="hdr-row">
+                        <FluentIcon Value="@(new Icons.Regular.Size16.Notebook())" Color="Color.Accent" />
+                        <strong>Notes</strong>
+                    </span>
+                    <em class="hdr-sub">supports multi-line text</em>
+                </span>
+            </HeaderTemplate>
+            <CellTemplate>@context.Notes</CellTemplate>
+        </FluTableColumn>
+
+        <FluTableColumn TItem="TableRow" Header="Date"
+                        SortBy="@(r => r.Date)">
+            <HeaderTemplate>
+                <span class="hdr-rich">
+                    <FluentIcon Value="@(new Icons.Regular.Size16.CalendarLtr())" Color="Color.Accent" />
+                    <strong>Date</strong>
+                    <span class="hdr-sub">(yyyy-MM-dd)</span>
+                </span>
+            </HeaderTemplate>
+            <CellTemplate>@context.Date.ToString("yyyy-MM-dd")</CellTemplate>
+        </FluTableColumn>
+    </ChildContent>
 
 </FluTable>
 </div>
 
 @code {
-    private List<TableRow> _rows      = SeedData.Generate(100);
-    private bool           _editMode  = true;
+    private List<TableRow> _rows       = SeedData.Generate(100);
+    private List<TableRow> _emptyRows  = new();
+    private bool           _editMode   = true;
+    private bool           _showEmpty  = false;
     private int            _fontSize     = 14;
     private int            _cellPadding  = 4;
     private int            _outerMargin  = 0;

@@ -100,6 +100,7 @@ We built a fully custom generic DataGrid instead of using FluentDataGrid.
 |-----------|------|---------|-------------|
 | `Items` | `List<TItem>` | `[]` | The data rows. Mutated in-place by row actions when `NewRowFactory` is set. |
 | `ChildContent` | `RenderFragment?` | — | Column definitions (`<FluTableColumn>` children) |
+| `EmptyContent` | `RenderFragment?` | — | Rendered inside a full-width `<tr>` when `Items` is empty; headers still render |
 | `NewRowFactory` | `Func<TItem>?` | `null` | When set, row-action insert buttons call this to produce new rows |
 | `ShowRowActions` | `bool` | `true` | Toggles the hover-reveal insert/delete icon column |
 | `OnInsertAt` | `EventCallback<int>` | — | Fired when `NewRowFactory` is null and the user inserts a row |
@@ -113,6 +114,9 @@ We built a fully custom generic DataGrid instead of using FluentDataGrid.
 | `Width` | `string?` | `null` | e.g. `"40px"` or `"20%"`. If null, distributed equally |
 | `Resizable` | `bool` | `true` | Whether resize handle appears |
 | `Multiline` | `bool` | `false` | `white-space: pre-wrap` on cells |
+| `OverflowTooltip` | `bool` | `false` | Auto `title=...` via JS when cell `scrollWidth > clientWidth` (skipped for multiline) |
+| `SortBy` | `Func<TItem, object?>?` | `null` | Sets column as sortable. Header click cycles asc → desc → none. Renders ▲/▼ and wires `aria-sort`. |
+| `Comparer` | `IComparer<TItem>?` | `null` | Custom row comparer. Wins over `SortBy` when both set. |
 | `CellTemplate` | `RenderFragment<TItem>?` | — | Cell content |
 | `HeaderTemplate` | `RenderFragment?` | — | Custom header content (any markup — icons, badges, etc.) |
 
@@ -148,7 +152,7 @@ It also reads FluentUI design tokens (`--accent-fill-rest`, `--neutral-foregroun
 
 ## NuGet package
 - **Published as** `FluTable` on https://www.nuget.org/packages/FluTable
-- **Current version**: `0.1.0` (metadata in `src/FluTable/FluTable.csproj` — PackageId, Version, Authors, Description, tags, `MIT` license expression, README path, project/repository URLs)
+- **Current version**: `0.2.0` (metadata in `src/FluTable/FluTable.csproj` — PackageId, Version, Authors, Description, tags, `MIT` license expression, README path, project/repository URLs)
 - **README.md** at repo root is shipped inside the package via `<None Include="..\..\README.md" Pack="true" />`
 - **Symbols package** (`.snupkg`) is built alongside the `.nupkg` so consumers can step into source in their debugger
 - **XML docs** are generated, with CS1591 suppressed until the public API has full `///` coverage

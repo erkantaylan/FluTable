@@ -46,6 +46,37 @@
     width: 96px;
 }
 
+/* ── Sorting ──────────────────────────────── */
+
+.ag-th-sortable {
+    cursor: pointer;
+}
+
+.ag-th-sortable:hover {
+    background: var(--neutral-fill-secondary-hover, #ebebeb);
+}
+
+.ag-sort-indicator {
+    display: inline-block;
+    margin-left: 4px;
+    font-size: 10px;
+    color: var(--accent-fill-rest, #0078d4);
+    min-width: 10px;
+}
+
+/* ── Empty state ──────────────────────────── */
+
+.ag-row-empty:hover .ag-td-empty {
+    background: transparent;
+}
+
+.ag-td-empty {
+    padding: 24px 12px;
+    text-align: center;
+    white-space: normal;
+    color: var(--neutral-foreground-hint-rest, #616161);
+}
+
 /* ── Resize handle ────────────────────────── */
 
 .ag-resize-handle {

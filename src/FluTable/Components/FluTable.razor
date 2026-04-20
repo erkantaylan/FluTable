@@ -32,7 +32,12 @@
                     {
                         var col = _columns[ci];
                         var showHandle = !col.IsFixed && ci != lastFlexIdx;
-                        <th class="ag-th @(col.IsFixed ? "ag-th-fixed" : "ag-th-resizable")">
+                        var sortable   = col.Sortable;
+                        var isSorted   = sortable && _sortCol == col;
+                        var sortGlyph  = isSorted ? (_sortAsc ? "▲" : "▼") : "";
+                        <th class="ag-th @(col.IsFixed ? "ag-th-fixed" : "ag-th-resizable") @(sortable ? "ag-th-sortable" : "")"
+                            aria-sort="@SortAria(col)"
+                            @onclick="@(() => HandleHeaderClick(col))">
                             <span class="ag-th-label">
                                 @if (col.HeaderTemplate is not null)
                                 {
@@ -42,10 +47,14 @@
                                 {
                                     @col.Header
                                 }
+                                @if (sortable)
+                                {
+                                    <span class="ag-sort-indicator">@sortGlyph</span>
+                                }
                             </span>
                             @if (showHandle)
                             {
-                                <div class="ag-resize-handle"></div>
+                                <div class="ag-resize-handle" @onclick:stopPropagation="true"></div>
                             }
                         </th>
                     }
@@ -57,32 +66,47 @@
             </thead>
 
             <tbody>
-                @for (var i = 0; i < Items.Count; i++)
+                @{
+                    var display = GetDisplayItems();
+                }
+                @if (display.Count == 0 && EmptyContent is not null)
                 {
-                    var item     = Items[i];
-                    var rowIndex = i;
-
-                    <tr class="ag-row">
-                        @foreach (var col in _columns)
-                        {
-                            <td class="ag-td @(col.Multiline ? "ag-multiline" : "")">
-                                @col.GetCellFor(item)
-                            </td>
-                        }
-                        @if (ShowRowActions)
-                        {
-                            <td class="ag-td ag-td-actions">
-                                <div class="ag-row-actions">
-                                    <button type="button" class="ag-btn-icon" title="Insert row above"
-                                            @onclick="@(() => HandleInsertAbove(rowIndex))">@IconArrowUp</button>
-                                    <button type="button" class="ag-btn-icon" title="Insert row below"
-                                            @onclick="@(() => HandleInsertBelow(rowIndex))">@IconArrowDown</button>
-                                    <button type="button" class="ag-btn-icon" title="Delete row"
-                                            @onclick="@(() => HandleDeleteRow(rowIndex))">@IconDelete</button>
-                                </div>
-                            </td>
-                        }
+                    <tr class="ag-row ag-row-empty">
+                        <td class="ag-td ag-td-empty" colspan="@(_columns.Count + (ShowRowActions ? 1 : 0))">
+                            @EmptyContent
+                        </td>
                     </tr>
+                }
+                else
+                {
+                    @for (var i = 0; i < display.Count; i++)
+                    {
+                        var item       = display[i];
+                        var sourceIdx  = _sortCol is null ? i : Items.IndexOf(item);
+
+                        <tr class="ag-row">
+                            @foreach (var col in _columns)
+                            {
+                                <td class="ag-td @(col.Multiline ? "ag-multiline" : "") @(col.OverflowTooltip ? "ag-overflow-tip" : "")"
+                                    data-overflow-tip="@(col.OverflowTooltip ? "1" : null)">
+                                    @col.GetCellFor(item)
+                                </td>
+                            }
+                            @if (ShowRowActions)
+                            {
+                                <td class="ag-td ag-td-actions">
+                                    <div class="ag-row-actions">
+                                        <button type="button" class="ag-btn-icon" title="Insert row above"
+                                                @onclick="@(() => HandleInsertAbove(sourceIdx))">@IconArrowUp</button>
+                                        <button type="button" class="ag-btn-icon" title="Insert row below"
+                                                @onclick="@(() => HandleInsertBelow(sourceIdx))">@IconArrowDown</button>
+                                        <button type="button" class="ag-btn-icon" title="Delete row"
+                                                @onclick="@(() => HandleDeleteRow(sourceIdx))">@IconDelete</button>
+                                    </div>
+                                </td>
+                            }
+                        </tr>
+                    }
                 }
             </tbody>
 

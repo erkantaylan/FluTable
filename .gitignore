@@ -7,3 +7,8 @@ obj/
 *.DS_Store
 .claude/
 .env
+
+# Gas Town runtime artifacts — must never land in the OSS repo
+.runtime/
+.beads/
+CLAUDE.local.md
