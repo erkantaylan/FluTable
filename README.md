@@ -8,6 +8,9 @@ Built because `FluentDataGrid` locks column widths to absolute pixels after the 
 
 - **Percentage-based column resize** — total table width always equals 100%, no horizontal scroll surprises
 - **Double-click auto-fit** — reads the natural content width of every cell in a column and sizes to it
+- **Column sorting** — set `SortBy` for click-to-sort headers (asc/desc/none cycle, `▲`/`▼` indicator, `aria-sort`), or pass a custom `IComparer<TItem>`
+- **`EmptyContent` slot** — supply a `RenderFragment` to render when `Items` is empty, no need to wrap the grid in `@if`
+- **Overflow tooltip** — set `OverflowTooltip="true"` to auto-attach a `title` attribute whenever a cell's text is actually truncated
 - **Generic `<TItem>`** — works with any model, no reflection, no attributes
 - **`CellTemplate` and `HeaderTemplate`** — put any Razor markup in cells and headers (icons, badges, buttons, subtitles)
 - **Multi-line cells** — set `Multiline="true"` for `white-space: pre-wrap` cells
@@ -103,6 +106,7 @@ The last flex column deliberately has **no** resize handle — there's no right-
 |-----------|------|---------|-------------|
 | `Items` | `List<TItem>` | required | The row data. Mutated in-place by row actions when `NewRowFactory` is set. |
 | `ChildContent` | `RenderFragment?` | — | Column definitions (`<FluTableColumn>` children). |
+| `EmptyContent` | `RenderFragment?` | — | Rendered inside a full-width row when `Items` is empty. Headers still render. |
 | `NewRowFactory` | `Func<TItem>?` | `null` | When set, row-action insert buttons call this to produce new rows and mutate `Items` directly. |
 | `ShowRowActions` | `bool` | `true` | Toggles the hover-reveal insert/delete buttons on each row. |
 | `OnInsertAt` | `EventCallback<int>` | — | Fired when `NewRowFactory` is `null` and the user clicks insert above/below. Receives the target index. |
@@ -116,8 +120,37 @@ The last flex column deliberately has **no** resize handle — there's no right-
 | `Width` | `string?` | `null` | e.g. `"40px"` or `"20%"`. If `null`, flex columns share the remaining space equally on first render. |
 | `Resizable` | `bool` | `true` | `false` marks the column as fixed — no resize handle, width not included in resize math. |
 | `Multiline` | `bool` | `false` | Applies `white-space: pre-wrap; word-break: break-word` to cells in this column. |
+| `OverflowTooltip` | `bool` | `false` | When `true`, cells get a `title` attribute automatically whenever their rendered text is truncated (`scrollWidth > clientWidth`). Skipped for multiline cells. |
+| `SortBy` | `Func<TItem, object?>?` | `null` | Makes the column sortable via header click. Value returned is compared naturally (`IComparable` / string fallback). |
+| `Comparer` | `IComparer<TItem>?` | `null` | Custom row comparer for domain-specific ordering (e.g. severity rank). Wins over `SortBy` when both are set. |
 | `CellTemplate` | `RenderFragment<TItem>?` | — | Cell content. `context` is the row item. |
 | `HeaderTemplate` | `RenderFragment?` | — | Custom header markup. |
+
+### Sorting
+
+```razor
+<FluTableColumn TItem="Meeting" Header="Date"
+                SortBy="@(m => m.Date)">
+    <CellTemplate>@context.Date.ToString("yyyy-MM-dd")</CellTemplate>
+</FluTableColumn>
+```
+
+Clicks cycle `ascending → descending → none` (source order). Only one column sorts at a time. `aria-sort` is set on the `<th>` for accessibility.
+
+### Empty state
+
+```razor
+<FluTable TItem="Device" Items="@devices">
+    <EmptyContent>
+        <div class="empty">No devices connected.</div>
+    </EmptyContent>
+    <ChildContent>
+        <FluTableColumn TItem="Device" Header="Name">
+            <CellTemplate>@context.Name</CellTemplate>
+        </FluTableColumn>
+    </ChildContent>
+</FluTable>
+```
 
 ## CSS variable theming
 

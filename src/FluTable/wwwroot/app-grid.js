@@ -1,5 +1,5 @@
 // ── Per-table state ────────────────────────────────────────────────────────
-// tableId → { ac: AbortController | null, colgroupObs: MutationObserver | null }
+// tableId → { ac, colgroupObs, tbodyObs, resizeObs }
 const grids = new Map();
 
 // ── Table initialization ───────────────────────────────────────────────────
@@ -25,7 +25,7 @@ function initTable(table) {
     if (cols.length === 0) {
         // No columns yet (first render before column registration completes).
         // Colgroup observer will reinit once cols arrive.
-        grids.set(id, { ac: null, colgroupObs });
+        grids.set(id, { ac: null, colgroupObs, tbodyObs: null, resizeObs: null });
         return;
     }
 
@@ -114,7 +114,49 @@ function initTable(table) {
         }, { signal: ac.signal });
     });
 
-    grids.set(id, { ac, colgroupObs });
+    // ── Overflow-tooltip watcher ─────────────────────────────────────────
+    // Set title="..." on cells marked [data-overflow-tip] whose content
+    // actually overflows. Re-evaluated on row changes and table resize.
+
+    const updateTips = () => updateOverflowTips(table);
+
+    const tbody = table.querySelector(':scope > tbody');
+    let tbodyObs = null;
+    if (tbody) {
+        tbodyObs = new MutationObserver(updateTips);
+        tbodyObs.observe(tbody, { childList: true, subtree: true, characterData: true });
+    }
+
+    let resizeObs = null;
+    if (typeof ResizeObserver !== 'undefined') {
+        resizeObs = new ResizeObserver(updateTips);
+        resizeObs.observe(table);
+    }
+
+    updateTips();
+
+    grids.set(id, { ac, colgroupObs, tbodyObs, resizeObs });
+}
+
+// ── Overflow tooltip ──────────────────────────────────────────────────────
+// Attach title attribute to [data-overflow-tip] cells when their content is
+// actually truncated (scrollWidth > clientWidth). Skip multiline cells.
+
+function updateOverflowTips(table) {
+    const cells = table.querySelectorAll(':scope > tbody > tr > td[data-overflow-tip]');
+    for (const cell of cells) {
+        if (cell.classList.contains('ag-multiline')) {
+            cell.removeAttribute('title');
+            continue;
+        }
+        if (cell.scrollWidth > cell.clientWidth) {
+            const text = cell.textContent?.trim();
+            if (text) cell.setAttribute('title', text);
+            else cell.removeAttribute('title');
+        } else {
+            cell.removeAttribute('title');
+        }
+    }
 }
 
 // ── Redistribute flex-column widths proportionally ─────────────────────────
@@ -219,6 +261,8 @@ function cleanup(id) {
     if (!state) return;
     state.ac?.abort();
     state.colgroupObs?.disconnect();
+    state.tbodyObs?.disconnect();
+    state.resizeObs?.disconnect();
     grids.delete(id);
 }
 

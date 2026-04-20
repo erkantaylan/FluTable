@@ -9,7 +9,7 @@
   <PropertyGroup>
     <!-- NuGet package metadata -->
     <PackageId>FluTable</PackageId>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <Authors>Erkan Taylan</Authors>
     <Company>Erkan Taylan</Company>
     <Copyright>Copyright © Erkan Taylan 2026</Copyright>
